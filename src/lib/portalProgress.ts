@@ -23,6 +23,17 @@ export type PortalState = {
   firstVisitAt: string;
   lastVisitAt: string;
   visitDays: string[];
+  inProgress: QuestionnaireSlug[];
+};
+
+/** Stable empty state for SSR / first client render (avoids hydration mismatch). */
+export const STABLE_EMPTY_PORTAL: PortalState = {
+  completions: [],
+  unlockedBadges: [],
+  firstVisitAt: "",
+  lastVisitAt: "",
+  visitDays: [],
+  inProgress: [],
 };
 
 function canUseStorage(): boolean {
@@ -41,7 +52,15 @@ function emptyState(): PortalState {
     firstVisitAt: now,
     lastVisitAt: now,
     visitDays: [todayKey()],
+    inProgress: [],
   };
+}
+
+function hasProgress(namespace: string): boolean {
+  if (namespace === "archetypes") {
+    return Boolean(readRaw("cura-interior:progress"));
+  }
+  return Boolean(readRaw(`cura-interior:${namespace}:progress`));
 }
 
 function readRaw(key: string): unknown | null {
@@ -78,13 +97,16 @@ function loadResultPayload(namespace: string): Record<string, unknown> | null {
 }
 
 export function loadPortalState(): PortalState {
-  if (!canUseStorage()) return emptyState();
+  if (!canUseStorage()) return { ...STABLE_EMPTY_PORTAL };
 
   try {
     const raw = window.localStorage.getItem(PORTAL_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as PortalState;
-      return syncPortalState(parsed);
+      return syncPortalState({
+        ...parsed,
+        inProgress: parsed.inProgress ?? [],
+      });
     }
   } catch {
     // fall through
@@ -150,6 +172,14 @@ export function syncPortalState(base?: PortalState): PortalState {
     });
   }
 
+  const inProgress = questionnaires
+    .filter(
+      (questionnaire) =>
+        !completions.some((item) => item.slug === questionnaire.slug) &&
+        hasProgress(questionnaire.storageNamespace),
+    )
+    .map((questionnaire) => questionnaire.slug);
+
   const visitDays = state.visitDays.includes(day)
     ? state.visitDays
     : [...state.visitDays, day];
@@ -157,6 +187,7 @@ export function syncPortalState(base?: PortalState): PortalState {
   const next: PortalState = {
     ...state,
     completions,
+    inProgress,
     lastVisitAt: now,
     visitDays,
     unlockedBadges: computeUnlockedBadges(completions, visitDays),
@@ -214,22 +245,7 @@ export function getQuestionnaireStatus(
   state: PortalState,
 ): DiscoveryStatus {
   if (state.completions.some((item) => item.slug === slug)) return "known";
-
-  const meta = getQuestionnaire(slug);
-  if (!meta) return "unexplored";
-
-  if (canUseStorage()) {
-    try {
-      const progressKey =
-        meta.storageNamespace === "archetypes"
-          ? "cura-interior:progress"
-          : `cura-interior:${meta.storageNamespace}:progress`;
-      if (window.localStorage.getItem(progressKey)) return "discovering";
-    } catch {
-      // ignore
-    }
-  }
-
+  if (state.inProgress?.includes(slug)) return "discovering";
   return "unexplored";
 }
 

@@ -13,7 +13,7 @@ import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { syncLocalProgressToSupabase } from "@/lib/portalSync";
 import {
-  loadPortalState,
+  STABLE_EMPTY_PORTAL,
   syncPortalState,
   type PortalState,
 } from "@/lib/portalProgress";
@@ -37,13 +37,11 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const supabase = useMemo(() => createClient(), []);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [portal, setPortal] = useState<PortalState>(() =>
-    typeof window === "undefined" ? loadPortalState() : syncPortalState(),
-  );
+  const [portal, setPortal] = useState<PortalState>(STABLE_EMPTY_PORTAL);
   const [loading, setLoading] = useState(true);
+  const [supabase] = useState(() => createClient());
 
   const refreshPortal = useCallback(() => {
     setPortal(syncPortalState());
@@ -83,7 +81,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true;
 
     async function init() {
-      refreshPortal();
+      setPortal(syncPortalState());
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -98,10 +97,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch {
           // Network/auth errors shouldn't block the app.
         }
+        if (!mounted) return;
         await refreshProfile();
       }
 
-      setLoading(false);
+      if (mounted) setLoading(false);
     }
 
     void init();
@@ -118,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // ignore
         }
         await refreshProfile();
+        setPortal(syncPortalState());
       }
 
       if (event === "SIGNED_OUT") {
@@ -129,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [refreshPortal, refreshProfile, supabase]);
+  }, [refreshProfile, supabase]);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
