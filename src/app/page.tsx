@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Button } from "@/components/Button";
 import { DiscoveryPath } from "@/components/DiscoveryPath";
 import { useAuth } from "@/components/AuthProvider";
@@ -34,24 +35,47 @@ export default function HomePage() {
 
   return (
     <div className="w-full">
-      <section className="animate-fade-up mx-auto flex min-h-[78vh] w-full max-w-6xl flex-col justify-center px-5 py-16 sm:px-8 sm:py-24">
-        <p className="section-eyebrow mb-6">Cura Interior</p>
-        <h1 className="display-xl max-w-4xl text-5xl text-ink sm:text-6xl md:text-7xl">
-          Conhecer a si
-          <br />
-          mesmo é um
-          <br />
-          <span className="text-accent">caminho.</span>
-        </h1>
-        <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-muted sm:text-xl">
-          Personalidade, emoções e padrões — uma camada de cada vez. Sem
-          checklist. Sem pressão.
-        </p>
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <Button href="/arquetipos">Começar a me conhecer</Button>
-          <Button href="/explorar" variant="secondary">
-            Explorar questionários
-          </Button>
+      <section className="animate-fade-up relative mx-auto flex min-h-[78vh] w-full max-w-6xl flex-col justify-center overflow-hidden px-5 py-16 sm:px-8 sm:py-24 lg:min-h-[86vh]">
+        <div className="pointer-events-none absolute inset-y-0 right-[-8%] hidden w-[58%] items-center lg:flex xl:right-[-4%] xl:w-[52%]">
+          <Image
+            src="/images/jung.png"
+            alt=""
+            width={900}
+            height={1100}
+            priority
+            className="h-auto w-full object-contain object-right opacity-90"
+          />
+        </div>
+
+        <div className="relative z-10 max-w-xl xl:max-w-2xl">
+          <p className="section-eyebrow mb-6">Cura Interior</p>
+          <h1 className="display-xl text-5xl text-ink sm:text-6xl md:text-7xl">
+            Conhecer a si
+            <br />
+            mesmo é um
+            <br />
+            <span className="text-accent">caminho.</span>
+          </h1>
+          <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-muted sm:text-xl">
+            Personalidade, emoções e padrões — uma camada de cada vez. Sem
+            checklist. Sem pressão.
+          </p>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Button href="/arquetipos">Começar a me conhecer</Button>
+            <Button href="/explorar" variant="secondary">
+              Explorar questionários
+            </Button>
+          </div>
+        </div>
+
+        <div className="relative z-10 mt-12 flex justify-center lg:hidden">
+          <Image
+            src="/images/jung.png"
+            alt="Ilustração em traço inspirada em Carl Jung"
+            width={420}
+            height={520}
+            className="h-auto w-[72%] max-w-sm object-contain opacity-85"
+          />
         </div>
       </section>
 
