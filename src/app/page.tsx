@@ -1,24 +1,28 @@
 "use client";
 
-import Image from "next/image";
 import { Button } from "@/components/Button";
-import { DiscoveryPath } from "@/components/DiscoveryPath";
+import { JungSketch } from "@/components/JungSketch";
+import { MagazineModuleSection } from "@/components/MagazineModuleSection";
 import { useAuth } from "@/components/AuthProvider";
-import {
-  getDiscoveryLevel,
-  getQuestionnaireStatus,
-} from "@/lib/portalProgress";
-import {
-  questionnaires,
-  type DiscoveryStatus,
-  type QuestionnaireSlug,
-} from "@/data/questionnaires";
-import { useEffect } from "react";
+import { modules } from "@/data/instruments";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function HomePage() {
-  const { user, portal, loading } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
+  const [hydrated, setHydrated] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+    const media = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setIsDesktop(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
 
   useEffect(() => {
     if (!loading && user) {
@@ -26,26 +30,16 @@ export default function HomePage() {
     }
   }, [loading, user, router]);
 
-  const statuses = Object.fromEntries(
-    questionnaires.map((item) => [
-      item.slug,
-      getQuestionnaireStatus(item.slug, portal),
-    ]),
-  ) as Record<QuestionnaireSlug, DiscoveryStatus>;
-
   return (
     <div className="w-full">
-      <section className="animate-fade-up relative mx-auto flex min-h-[78vh] w-full max-w-6xl flex-col justify-center overflow-hidden px-5 py-16 sm:px-8 sm:py-24 lg:min-h-[86vh]">
-        <div className="pointer-events-none absolute inset-y-0 right-[-8%] hidden w-[58%] items-center lg:flex xl:right-[-4%] xl:w-[52%]">
-          <Image
-            src="/images/jung.png"
-            alt=""
-            width={900}
-            height={1100}
-            priority
-            className="h-auto w-full object-contain object-right opacity-90"
-          />
-        </div>
+      <section className="animate-fade-up relative mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col justify-center overflow-hidden px-5 py-14 sm:px-8 sm:py-16 lg:min-h-[78vh]">
+        {hydrated && isDesktop && (
+          <div className="pointer-events-none absolute inset-y-0 right-[-8%] flex w-[58%] items-center xl:right-[-4%] xl:w-[52%]">
+            <div className="hero-jung-stage w-full">
+              <JungSketch className="hero-jung w-full" align="right" />
+            </div>
+          </div>
+        )}
 
         <div className="relative z-10 max-w-xl xl:max-w-2xl">
           <p className="section-eyebrow mb-6">Cura Interior</p>
@@ -57,71 +51,60 @@ export default function HomePage() {
             <span className="text-accent">caminho.</span>
           </h1>
           <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-muted sm:text-xl">
-            Personalidade, emoções e padrões — uma camada de cada vez. Sem
-            checklist. Sem pressão.
+            Cinco territórios. Questionários prontos — escolha um e veja o
+            resultado na hora.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Button href="/arquetipos">Começar a me conhecer</Button>
-            <Button href="/explorar" variant="secondary">
-              Explorar questionários
+            <Button href="#territorios">Explorar territórios</Button>
+            <Button href="/instrumentos/big-five" variant="secondary">
+              Começar pelo Big Five
             </Button>
           </div>
         </div>
 
-        <div className="relative z-10 mt-12 flex justify-center lg:hidden">
-          <Image
-            src="/images/jung.png"
-            alt="Ilustração em traço inspirada em Carl Jung"
-            width={420}
-            height={520}
-            className="h-auto w-[72%] max-w-sm object-contain opacity-85"
-          />
-        </div>
-      </section>
-
-      <section className="block-dark">
-        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
-          <p className="section-eyebrow !text-accent-pink mb-6">Manifesto</p>
-          <p className="display-xl max-w-4xl text-3xl text-ink-inverse sm:text-4xl md:text-5xl">
-            Autoconhecimento não precisa parecer consultório.
-            <span className="text-accent"> Pode ser vivo.</span> Direto. Um
-            pouco ousado.
-          </p>
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/65 sm:text-lg">
-            Você não precisa descobrir tudo de uma vez. Cada experiência é só
-            mais uma parte do mapa.
-          </p>
-        </div>
-      </section>
-
-      <section
-        id="como-funciona"
-        className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 sm:py-24"
-      >
-        <DiscoveryPath
-          statuses={statuses}
-          completedCount={getDiscoveryLevel(portal.completions)}
-        />
-      </section>
-
-      <section className="mx-auto w-full max-w-6xl px-5 pb-20 sm:px-8 sm:pb-28">
-        <article className="card-panel overflow-hidden p-7 sm:p-10 md:flex md:items-end md:justify-between md:gap-10">
-          <div className="max-w-2xl space-y-4">
-            <p className="section-eyebrow">Por onde começar?</p>
-            <p className="stage-number text-6xl text-accent sm:text-7xl">01</p>
-            <h2 className="display-xl text-3xl text-ink sm:text-4xl">
-              Arquétipos.
-            </h2>
-            <p className="text-base leading-relaxed text-ink-muted sm:text-lg">
-              O ponto mais acessível do mapa: padrões que aparecem nas suas
-              relações, escolhas e jeitos de viver. Depois você decide o
-              resto.
-            </p>
+        {hydrated && !isDesktop && (
+          <div className="relative z-10 mt-12 flex justify-center">
+            <div className="hero-jung-stage w-[72%] max-w-sm">
+              <JungSketch
+                className="hero-jung hero-jung-mobile w-full"
+                align="center"
+                labeled
+              />
+            </div>
           </div>
-          <div className="mt-8 md:mt-0">
-            <Button href="/arquetipos">Fazer minha primeira descoberta</Button>
+        )}
+      </section>
+
+      <div id="territorios" className="scroll-mt-24">
+        {modules.map((module) => (
+          <div
+            key={module.slug}
+            id={`modulo-${module.slug}`}
+            className="scroll-mt-24"
+          >
+            <MagazineModuleSection module={module} />
           </div>
-        </article>
+        ))}
+      </div>
+
+      <section id="como-funciona" className="scroll-mt-24 border-t border-border">
+        <div className="mx-auto max-w-6xl space-y-6 px-5 py-16 sm:px-8 sm:py-20">
+          <p className="section-eyebrow !text-accent-pink">Como funciona</p>
+          <p className="display-xl max-w-4xl text-3xl text-ink sm:text-4xl md:text-5xl">
+            Abra um questionário, responda, receba o
+            <span className="text-accent"> resultado.</span>
+          </p>
+          <p className="max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
+            Sem trilhas obrigatórias. Cada teste tem metodologia e pontuação
+            próprias.
+          </p>
+          <Link
+            href="/explorar"
+            className="inline-flex text-sm font-semibold tracking-wide text-accent-pink underline-offset-4 transition-opacity hover:opacity-70"
+          >
+            Ver catálogo completo
+          </Link>
+        </div>
       </section>
     </div>
   );

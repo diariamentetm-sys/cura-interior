@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/Button";
-import { questionnaires } from "@/data/questionnaires";
+import { getInstrument } from "@/data/instruments";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -16,7 +16,9 @@ export default function HistoricoPage() {
 
   if (loading || !user) {
     return (
-      <div className="py-24 text-center text-ink-muted">Carregando histórico...</div>
+      <div className="py-24 text-center text-ink-muted">
+        Carregando histórico...
+      </div>
     );
   }
 
@@ -30,27 +32,31 @@ export default function HistoricoPage() {
       <div className="space-y-4">
         <p className="section-eyebrow">Histórico</p>
         <h1 className="display-xl text-4xl text-ink sm:text-5xl">
-          Suas experiências
+          Suas avaliações
         </h1>
         <p className="max-w-2xl text-base text-ink-muted">
-          Revisite descobertas anteriores. Seu mapa continua mudando com você.
+          Cada resultado permanece independente, com a metodologia do próprio
+          instrumento.
         </p>
       </div>
 
       <ul className="mt-12 space-y-6">
         {items.length === 0 && (
-          <li className="text-ink-muted">
-            Ainda não há experiências registradas.
-          </li>
+          <li className="text-ink-muted">Ainda não há avaliações registradas.</li>
         )}
         {items.map((item) => {
-          const meta = questionnaires.find((q) => q.slug === item.slug)!;
+          const meta = getInstrument(item.slug as never);
           return (
             <li
               key={`${item.slug}-${item.completedAt}`}
               className="space-y-3 border-t border-border/70 pt-6"
             >
-              <h2 className="font-display text-2xl text-ink">{meta.name}</h2>
+              <h2 className="font-display text-2xl text-ink">
+                {meta?.name ?? item.slug}
+              </h2>
+              {item.primaryLabel && (
+                <p className="text-sm text-ink">{item.primaryLabel}</p>
+              )}
               <p className="text-sm text-ink-muted">
                 Concluído em{" "}
                 {new Date(item.completedAt).toLocaleDateString("pt-BR", {
@@ -59,13 +65,21 @@ export default function HistoricoPage() {
                   year: "numeric",
                 })}
               </p>
-              <Button href={meta.resultHref} variant="secondary">
-                Abrir resultado
-              </Button>
+              {meta && (
+                <Button href={meta.resultHref} variant="ghost">
+                  Revisar resultado
+                </Button>
+              )}
             </li>
           );
         })}
       </ul>
+
+      <div className="mt-10">
+        <Button href="/meu-mapa" variant="secondary">
+          Voltar ao mapa
+        </Button>
+      </div>
     </div>
   );
 }

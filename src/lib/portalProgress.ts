@@ -1,18 +1,17 @@
 import { badges, type BadgeSlug } from "@/data/badges";
 import {
-  RECOMMENDED_ORDER,
-  getQuestionnaire,
-  questionnaires,
+  instruments,
+  getInstrument,
   type DiscoveryStatus,
-  type QuestionnaireSlug,
-} from "@/data/questionnaires";
-import { discoveryLevelMessages } from "@/data/discoveryStages";
+  type InstrumentSlug,
+} from "@/data/instruments";
+import { hasInstrumentProgress, hasInstrumentResult, loadInstrumentResult } from "@/lib/instrumentStorage";
+import { loadCognitiveExploration } from "@/lib/cognitive/storage";
 
 const PORTAL_KEY = "cura-interior:portal";
-const LEGACY_ARCHETYPE_RESULT = "cura-interior:result";
 
 export type LocalCompletion = {
-  slug: QuestionnaireSlug;
+  slug: InstrumentSlug | string;
   completedAt: string;
   primaryLabel?: string;
 };
@@ -23,10 +22,9 @@ export type PortalState = {
   firstVisitAt: string;
   lastVisitAt: string;
   visitDays: string[];
-  inProgress: QuestionnaireSlug[];
+  inProgress: string[];
 };
 
-/** Stable empty state for SSR / first client render (avoids hydration mismatch). */
 export const STABLE_EMPTY_PORTAL: PortalState = {
   completions: [],
   unlockedBadges: [],
@@ -56,13 +54,6 @@ function emptyState(): PortalState {
   };
 }
 
-function hasProgress(namespace: string): boolean {
-  if (namespace === "archetypes") {
-    return Boolean(readRaw("cura-interior:progress"));
-  }
-  return Boolean(readRaw(`cura-interior:${namespace}:progress`));
-}
-
 function readRaw(key: string): unknown | null {
   if (!canUseStorage()) return null;
   try {
@@ -71,29 +62,6 @@ function readRaw(key: string): unknown | null {
   } catch {
     return null;
   }
-}
-
-function hasResult(namespace: string): boolean {
-  if (namespace === "archetypes") {
-    return Boolean(
-      readRaw(LEGACY_ARCHETYPE_RESULT) ||
-        readRaw("cura-interior:archetypes:result"),
-    );
-  }
-  return Boolean(readRaw(`cura-interior:${namespace}:result`));
-}
-
-function loadResultPayload(namespace: string): Record<string, unknown> | null {
-  if (namespace === "archetypes") {
-    return (
-      (readRaw("cura-interior:archetypes:result") as Record<string, unknown> | null) ||
-      (readRaw(LEGACY_ARCHETYPE_RESULT) as Record<string, unknown> | null)
-    );
-  }
-  return readRaw(`cura-interior:${namespace}:result`) as Record<
-    string,
-    unknown
-  > | null;
 }
 
 export function loadPortalState(): PortalState {
@@ -124,61 +92,52 @@ function savePortalState(state: PortalState): void {
   }
 }
 
-function derivePrimaryLabel(
-  slug: QuestionnaireSlug,
-  payload: Record<string, unknown> | null,
-): string | undefined {
-  if (!payload) return undefined;
-
-  if (slug === "arquetipos") {
-    const primary = payload.primary as { code?: string } | undefined;
-    return primary?.code;
-  }
-  if (slug === "persona") {
-    return payload.dominantPersona as string | undefined;
-  }
-  if (slug === "necessidades-emocionais") {
-    return payload.dominantNeed as string | undefined;
-  }
-  if (slug === "conflitos-internos") {
-    return payload.dominantConflict as string | undefined;
-  }
-  if (slug === "sombra") {
-    const primary = payload.primary as { code?: string } | undefined;
-    return primary?.code;
-  }
-  return undefined;
-}
-
 export function syncPortalState(base?: PortalState): PortalState {
   const state = base ?? emptyState();
   const now = new Date().toISOString();
   const day = todayKey();
-
   const completions = [...state.completions];
 
-  for (const questionnaire of questionnaires) {
-    if (!hasResult(questionnaire.storageNamespace)) continue;
-    if (completions.some((item) => item.slug === questionnaire.slug)) continue;
+  for (const instrument of instruments) {
+    if (instrument.external) {
+      const cognitive = loadCognitiveExploration();
+      if (cognitive.status !== "known" || !cognitive.lastCompletedAt) continue;
+      if (completions.some((item) => item.slug === instrument.slug)) continue;
+      completions.push({
+        slug: instrument.slug,
+        completedAt: cognitive.lastCompletedAt,
+        primaryLabel:
+          typeof cognitive.lastCorrectCount === "number" &&
+          typeof cognitive.lastTotalQuestions === "number"
+            ? `${cognitive.lastCorrectCount}/${cognitive.lastTotalQuestions}`
+            : "Perfil cognitivo",
+      });
+      continue;
+    }
 
-    const payload = loadResultPayload(questionnaire.storageNamespace);
+    if (!hasInstrumentResult(instrument.storageNamespace)) continue;
+    if (completions.some((item) => item.slug === instrument.slug)) continue;
+
+    const payload = loadInstrumentResult<Record<string, unknown>>(
+      instrument.storageNamespace,
+    );
     completions.push({
-      slug: questionnaire.slug,
+      slug: instrument.slug,
       completedAt:
-        (payload?.calculatedAt as string | undefined) ||
-        (payload?.completedAt as string | undefined) ||
-        now,
-      primaryLabel: derivePrimaryLabel(questionnaire.slug, payload),
+        (payload?.calculatedAt as string | undefined) || now,
+      primaryLabel: (payload?.primaryLabel as string | undefined) || instrument.name,
     });
   }
 
-  const inProgress = questionnaires
-    .filter(
-      (questionnaire) =>
-        !completions.some((item) => item.slug === questionnaire.slug) &&
-        hasProgress(questionnaire.storageNamespace),
-    )
-    .map((questionnaire) => questionnaire.slug);
+  const inProgress = instruments
+    .filter((instrument) => {
+      if (completions.some((item) => item.slug === instrument.slug)) return false;
+      if (instrument.external) {
+        return loadCognitiveExploration().status === "discovering";
+      }
+      return hasInstrumentProgress(instrument.storageNamespace);
+    })
+    .map((instrument) => instrument.slug);
 
   const visitDays = state.visitDays.includes(day)
     ? state.visitDays
@@ -197,8 +156,8 @@ export function syncPortalState(base?: PortalState): PortalState {
   return next;
 }
 
-export function recordQuestionnaireCompletion(
-  slug: QuestionnaireSlug,
+export function recordInstrumentCompletion(
+  slug: InstrumentSlug | string,
   options?: { primaryLabel?: string; completedAt?: string },
 ): PortalState {
   const state = loadPortalState();
@@ -224,24 +183,38 @@ export function recordQuestionnaireCompletion(
         },
       ];
 
-  const next = syncPortalState({
+  return syncPortalState({
     ...state,
     completions,
   });
-
-  return next;
 }
 
+/** @deprecated use recordInstrumentCompletion */
+export const recordQuestionnaireCompletion = recordInstrumentCompletion;
+
 export function getDiscoveryLevel(completions: LocalCompletion[]): number {
-  return Math.min(5, completions.length);
+  const known = new Set(
+    completions
+      .map((c) => c.slug)
+      .filter((slug) => instruments.some((i) => i.slug === slug)),
+  );
+  return Math.min(5, known.size);
 }
 
 export function getDiscoveryLevelMessage(level: number): string {
-  return discoveryLevelMessages[level] ?? discoveryLevelMessages[0];
+  const messages: Record<number, string> = {
+    0: "Todo mapa começa com um primeiro ponto.",
+    1: "Uma avaliação já faz parte do seu mapa.",
+    2: "Duas dimensões exploradas — o painel começa a ganhar forma.",
+    3: "Três avaliações registradas. Continue no seu ritmo.",
+    4: "Quatro dimensões exploradas no mapa.",
+    5: "Cinco ou mais avaliações no seu painel.",
+  };
+  return messages[level] ?? messages[0];
 }
 
-export function getQuestionnaireStatus(
-  slug: QuestionnaireSlug,
+export function getInstrumentStatus(
+  slug: InstrumentSlug | string,
   state: PortalState,
 ): DiscoveryStatus {
   if (state.completions.some((item) => item.slug === slug)) return "known";
@@ -249,12 +222,13 @@ export function getQuestionnaireStatus(
   return "unexplored";
 }
 
-export function getNextRecommended(
-  state: PortalState,
-): QuestionnaireSlug | null {
-  for (const slug of RECOMMENDED_ORDER) {
-    if (!state.completions.some((item) => item.slug === slug)) {
-      return slug;
+/** @deprecated */
+export const getQuestionnaireStatus = getInstrumentStatus;
+
+export function getNextRecommended(state: PortalState): InstrumentSlug | null {
+  for (const instrument of instruments) {
+    if (!state.completions.some((item) => item.slug === instrument.slug)) {
+      return instrument.slug;
     }
   }
   return null;
@@ -264,18 +238,10 @@ export function computeUnlockedBadges(
   completions: LocalCompletion[],
   visitDays: string[],
 ): BadgeSlug[] {
-  const completed = new Set(completions.map((item) => item.slug));
   const unlocked: BadgeSlug[] = [];
 
   for (const badge of badges) {
     if (badge.requiresCount && completions.length >= badge.requiresCount) {
-      unlocked.push(badge.slug);
-      continue;
-    }
-    if (
-      badge.requires &&
-      badge.requires.every((slug) => completed.has(slug))
-    ) {
       unlocked.push(badge.slug);
       continue;
     }
@@ -288,54 +254,20 @@ export function computeUnlockedBadges(
 }
 
 export function getLocalResultPayload(
-  slug: QuestionnaireSlug,
+  slug: string,
 ): Record<string, unknown> | null {
-  const meta = getQuestionnaire(slug);
+  const meta = getInstrument(slug as InstrumentSlug);
   if (!meta) return null;
-  return loadResultPayload(meta.storageNamespace);
+  if (meta.external) {
+    return readRaw("cura-interior:cognitive:result") as Record<
+      string,
+      unknown
+    > | null;
+  }
+  return loadInstrumentResult<Record<string, unknown>>(meta.storageNamespace);
 }
 
-export function buildSynthesis(state: PortalState): string | null {
-  if (state.completions.length < 3) return null;
-
-  const parts: string[] = [];
-  const bySlug = Object.fromEntries(
-    state.completions.map((item) => [item.slug, item]),
-  ) as Partial<Record<QuestionnaireSlug, LocalCompletion>>;
-
-  if (bySlug.arquetipos?.primaryLabel) {
-    parts.push(
-      `Seu arquétipo predominante aponta um padrão importante ligado a ${bySlug.arquetipos.primaryLabel}.`,
-    );
-  }
-
-  if (bySlug["necessidades-emocionais"]?.primaryLabel) {
-    parts.push(
-      `Nas suas necessidades emocionais, ${bySlug["necessidades-emocionais"].primaryLabel} aparece com destaque.`,
-    );
-  }
-
-  if (bySlug["conflitos-internos"]?.primaryLabel) {
-    parts.push(
-      `Ao mesmo tempo, seu mapa de conflitos mostra uma tensão importante em ${bySlug["conflitos-internos"].primaryLabel}.`,
-    );
-  }
-
-  if (bySlug.persona?.primaryLabel) {
-    parts.push(
-      `Na Persona, ${bySlug.persona.primaryLabel} revela como você tende a se apresentar.`,
-    );
-  }
-
-  if (bySlug.sombra?.primaryLabel) {
-    parts.push(
-      `Na Sombra, ${bySlug.sombra.primaryLabel} indica um aspecto que pede atenção cuidadosa.`,
-    );
-  }
-
-  if (parts.length === 0) {
-    return "Seu mapa já reúne diferentes camadas. Revisite cada resultado para observar como elas se relacionam — sem pressa.";
-  }
-
-  return `${parts.join(" ")} Nenhum resultado conta sua história sozinho.`;
+/** Meu Mapa: sem síntese cruzada entre instrumentos. */
+export function buildSynthesis(_state: PortalState): string | null {
+  return null;
 }

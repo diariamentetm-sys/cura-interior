@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f5f4f0;
+  --bg: #ffffff;
   --bg-elevated: #ffffff;
   --surface: #ffffff;
   --sand: #e8e6e0;
@@ -14,12 +14,12 @@
   --terracotta: #ff3b2e;
   --wine: #ff3b2e;
   --olive: #2b5bff;
-  --brown: #0e0e0e;
-  --ink: #0e0e0e;
+  --brown: #3d3a36;
+  --ink: #2a2826;
   --ink-muted: #5a5854;
-  --ink-inverse: #f5f4f0;
+  --ink-inverse: #2a2826;
   --border: #e4e2dc;
-  --dark: #0e0e0e;
+  --dark: #ffffff;
   --focus: #2b5bff;
 }
 
@@ -56,11 +56,7 @@ html {
 }
 
 body {
-  background:
-    radial-gradient(ellipse 70% 45% at 0% 0%, rgba(255, 59, 46, 0.07), transparent 55%),
-    radial-gradient(ellipse 55% 40% at 100% 5%, rgba(43, 91, 255, 0.08), transparent 50%),
-    radial-gradient(ellipse 50% 35% at 80% 100%, rgba(255, 79, 154, 0.05), transparent 45%),
-    var(--bg);
+  background: var(--bg);
   color: var(--ink);
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   min-height: 100vh;
@@ -119,12 +115,13 @@ body {
 .card-panel:hover {
   transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--ink) 18%, var(--border));
-  box-shadow: 0 18px 40px -28px rgba(14, 14, 14, 0.35);
+  box-shadow: 0 18px 40px -28px rgba(42, 40, 38, 0.12);
 }
 
 .block-dark {
-  background: var(--dark);
-  color: var(--ink-inverse);
+  background: var(--bg);
+  color: var(--ink);
+  border-top: 1px solid var(--border);
 }
 
 @keyframes fade-up {
@@ -155,6 +152,105 @@ body {
   animation: fade-in 0.45s ease-out both;
 }
 
+.mind-map-branch {
+  animation: fade-up 0.6s ease-out both;
+}
+
+.mind-map-branch:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.mind-map-branch:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.mind-map-branch:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.mind-map-branch:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.mind-map-branch:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.mind-map-branch:nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+@keyframes mind-map-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+.mind-map-stage {
+  overflow: visible;
+}
+
+.mind-map-node-float {
+  animation: mind-map-float 3.8s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+  transform-box: view-box;
+}
+
+.mind-map-center-float {
+  animation: mind-map-float 4.6s ease-in-out infinite;
+  animation-delay: 0.2s;
+  transform-box: view-box;
+}
+
+.mind-map-node {
+  cursor: pointer;
+  outline: none;
+  transform-box: view-box;
+  transition: transform 0.25s ease;
+}
+
+.mind-map-node:hover,
+.mind-map-node:focus-visible {
+  transform: scale(1.1);
+}
+
+.mind-map-node:focus-visible circle {
+  stroke: #ffffff;
+  stroke-width: 3;
+}
+
+.dimension-target-flash {
+  animation: dimension-flash 1.5s ease-out;
+}
+
+@keyframes dimension-flash {
+  0% {
+    background: color-mix(in srgb, var(--accent-pink) 18%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+.mind-map-node-label {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.mind-map-node-pct {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.mind-map-center-label {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
 @keyframes aura-breathe {
   0%,
   100% {
@@ -167,14 +263,235 @@ body {
   }
 }
 
+@keyframes jung-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-6px, -10px, 0);
+  }
+}
+
+@keyframes jung-stroke-loop {
+  0% {
+    stroke-dashoffset: var(--path-length);
+  }
+  28% {
+    stroke-dashoffset: 0;
+  }
+  58% {
+    stroke-dashoffset: 0;
+  }
+  82% {
+    stroke-dashoffset: calc(var(--path-length) * 0.42);
+  }
+  100% {
+    stroke-dashoffset: var(--path-length);
+  }
+}
+
+.hero-jung-stage {
+  animation: none;
+}
+
+.hero-jung-draw {
+  width: 100%;
+  opacity: 1;
+}
+
+.hero-jung-draw svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.hero-jung {
+  transform-origin: center right;
+  animation: jung-drift 10s ease-in-out infinite;
+}
+
+.hero-jung-mobile {
+  transform-origin: center center;
+}
+
+.hero-jung-draw.is-looping path {
+  will-change: stroke-dashoffset;
+}
+
+.quiz-gallery-section {
+  background: var(--bg);
+  color: var(--ink);
+  border-top: 1px solid var(--border);
+}
+
+.quiz-gallery {
+  position: relative;
+  width: 100%;
+  height: min(100vh, 760px);
+  min-height: 580px;
+  overflow: hidden;
+}
+
+.quiz-gallery-copy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  max-width: 36rem;
+  padding: 2rem 1.25rem 0;
+}
+
+@media (min-width: 640px) {
+  .quiz-gallery-copy {
+    padding: 2.5rem 2rem 0;
+  }
+}
+
+.quiz-cards {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  width: 14rem;
+  height: 20rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform: translate(-50%, -50%);
+  touch-action: none;
+  cursor: grab;
+}
+
+.quiz-cards:active {
+  cursor: grabbing;
+}
+
+.quiz-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 14rem;
+  height: 20rem;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  border-radius: 1.1rem;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent),
+    0 28px 60px -28px rgba(42, 40, 38, 0.16);
+}
+
+.quiz-card-link {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.35rem 1.25rem 1.4rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.quiz-card-index {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  opacity: 0.72;
+}
+
+.quiz-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.quiz-card-title {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.quiz-card-question {
+  font-size: 0.92rem;
+  line-height: 1.35;
+  opacity: 0.82;
+}
+
+.quiz-gallery-actions {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  transform: translateX(-50%);
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.quiz-gallery-btn {
+  min-height: 2.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.55rem 1.25rem;
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.quiz-gallery-btn:hover {
+  border-color: color-mix(in srgb, var(--ink) 35%, var(--border));
+  background: color-mix(in srgb, var(--sand) 55%, white);
+}
+
+.quiz-drag-proxy {
+  position: absolute;
+  visibility: hidden;
+}
+
+@media (min-width: 768px) {
+  .quiz-cards,
+  .quiz-card {
+    width: 16rem;
+    height: 22.5rem;
+  }
+
+  .quiz-card-title {
+    font-size: 1.9rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
   .animate-fade-up,
-  .animate-fade-in {
+  .animate-fade-in,
+  .mind-map-branch,
+  .mind-map-node-float,
+  .mind-map-center-float,
+  .dimension-target-flash {
     animation: none;
+  }
+
+  .mind-map-node:hover,
+  .mind-map-node:focus-visible {
+    transform: none;
+  }
+
+  .hero-jung-stage,
+  .hero-jung,
+  .hero-jung-draw.is-looping path {
+    animation: none !important;
   }
 
   .card-panel {

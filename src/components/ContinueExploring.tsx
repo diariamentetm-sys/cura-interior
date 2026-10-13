@@ -1,100 +1,59 @@
 "use client";
 
 import { Button } from "@/components/Button";
-import { experiences } from "@/data/experiences";
-import { questionnaires } from "@/data/questionnaires";
-import { emotionalNeedsStorage } from "@/lib/emotionalNeedsStorage";
-import { internalConflictsStorage } from "@/lib/internalConflictsStorage";
-import { personaStorage } from "@/lib/personaStorage";
-import { loadResult as loadArchetypeResult } from "@/lib/storage";
-import { shadowStorage } from "@/lib/shadowStorage";
+import { instruments } from "@/data/instruments";
+import { hasInstrumentResult } from "@/lib/instrumentStorage";
+import { loadCognitiveExploration } from "@/lib/cognitive/storage";
 import { useEffect, useState } from "react";
-
-type ContinueItem = {
-  id: string;
-  title: string;
-  description: string;
-  href: string;
-  resultHref?: string;
-  cta: string;
-  hasResult: boolean;
-};
 
 type ContinueExploringProps = {
   excludeId?: string;
 };
 
 export function ContinueExploring({ excludeId }: ContinueExploringProps) {
-  const [items, setItems] = useState<ContinueItem[]>([]);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const availability: Record<string, boolean> = {
-      arquetipos: Boolean(loadArchetypeResult()),
-      sombra: Boolean(shadowStorage.loadResult()),
-      persona: Boolean(personaStorage.loadResult()),
-      "necessidades-emocionais": Boolean(emotionalNeedsStorage.loadResult()),
-      "conflitos-internos": Boolean(internalConflictsStorage.loadResult()),
-    };
+    setReady(true);
+  }, []);
 
-    setItems(
-      experiences
-        .filter((experience) => experience.id !== excludeId)
-        .map((experience) => {
-          const meta = questionnaires.find((item) => item.slug === experience.id);
-          return {
-            id: experience.id,
-            title: experience.title,
-            description: experience.description,
-            href: experience.href,
-            resultHref: meta?.resultHref,
-            cta: experience.cta,
-            hasResult: Boolean(availability[experience.id]),
-          };
-        }),
-    );
-  }, [excludeId]);
+  if (!ready) return null;
+
+  const items = instruments
+    .filter((item) => item.slug !== excludeId)
+    .map((item) => {
+      const hasResult = item.external
+        ? loadCognitiveExploration().status === "known"
+        : hasInstrumentResult(item.storageNamespace);
+      return { ...item, hasResult };
+    })
+    .filter((item) => !item.hasResult)
+    .slice(0, 3);
 
   if (items.length === 0) return null;
 
   return (
-    <section className="animate-fade-in space-y-8 border-t border-border/70 pt-10">
-      <div className="space-y-2">
-        <h2 className="font-display text-2xl text-ink sm:text-3xl">
-          Continue se conhecendo
-        </h2>
-        <p className="text-base text-ink-muted">
-          Cada experiência revela um olhar diferente sobre você. Você pode
-          continuar quando sentir vontade.
-        </p>
+    <section className="space-y-6">
+      <div>
+        <p className="section-eyebrow mb-2">Continuar</p>
+        <h2 className="font-display text-2xl text-ink">Outros questionários</h2>
       </div>
-
-      <div className="space-y-8">
+      <ul className="space-y-3">
         {items.map((item) => (
-          <article key={item.id} className="space-y-3">
-            <div className="flex flex-wrap items-baseline gap-3">
-              <h3 className="font-display text-xl text-ink">{item.title}</h3>
-              {item.hasResult && (
-                <span className="text-xs tracking-[0.14em] text-olive uppercase">
-                  Resultado disponível
-                </span>
-              )}
+          <li
+            key={item.slug}
+            className="flex flex-col gap-3 rounded-2xl border border-border bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div>
+              <p className="font-display text-lg text-ink">{item.name}</p>
+              <p className="text-sm text-ink-muted">{item.shortDescription}</p>
             </div>
-            <p className="max-w-2xl text-base text-ink-muted">
-              {item.description}
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Button href={item.href} variant="secondary">
-                {item.cta}
-              </Button>
-              {item.hasResult && item.resultHref && (
-                <Button href={item.resultHref} variant="ghost">
-                  Ver resultado salvo
-                </Button>
-              )}
-            </div>
-          </article>
+            <Button href={item.href} variant="secondary" className="!min-h-10">
+              Começar
+            </Button>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

@@ -1,20 +1,17 @@
-import {
-  questionnaires,
-  type QuestionnaireSlug,
-} from "@/data/questionnaires";
+import { instruments } from "@/data/instruments";
 
 export type Experience = {
-  id: QuestionnaireSlug;
+  id: string;
   title: string;
   description: string;
   href: string;
   cta: string;
 };
 
-export const experiences: Experience[] = questionnaires.map((item) => ({
+export const experiences: Experience[] = instruments.map((item) => ({
   id: item.slug,
   title: item.name,
-  description: item.description,
+  description: item.shortDescription,
   href: item.href,
-  cta: item.cta,
+  cta: "Começar",
 }));

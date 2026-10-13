@@ -15,7 +15,7 @@ export function Header() {
     !pathname?.startsWith("/explorar");
 
   const publicLinks = [
-    { href: "/#como-funciona", label: "Como funciona" },
+    { href: "/#territorios", label: "Territórios" },
     { href: "/explorar", label: "Explorar" },
   ];
 

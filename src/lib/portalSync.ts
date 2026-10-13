@@ -1,5 +1,5 @@
 import type { BadgeSlug } from "@/data/badges";
-import type { QuestionnaireSlug } from "@/data/questionnaires";
+import type { InstrumentSlug } from "@/data/instruments";
 import { createClient } from "@/lib/supabase/client";
 import {
   getDiscoveryLevel,
@@ -81,7 +81,7 @@ export async function syncLocalProgressToSupabase(userId: string): Promise<void>
 
 export async function saveAuthenticatedCompletion(options: {
   userId: string;
-  slug: QuestionnaireSlug;
+  slug: InstrumentSlug | string;
   result: Record<string, unknown>;
   state: PortalState;
 }): Promise<void> {

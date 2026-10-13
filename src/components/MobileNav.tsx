@@ -21,7 +21,10 @@ export function MobileNav() {
   const pathname = usePathname();
   const { user } = useAuth();
 
+  // Esconde quando há barra CTA fixa (intro, questionário, resultado).
   if (pathname?.includes("/questionario")) return null;
+  if (pathname?.includes("/resultado")) return null;
+  if (/^\/instrumentos\/[^/]+$/.test(pathname ?? "")) return null;
 
   const items = user ? authItems : publicItems;
 

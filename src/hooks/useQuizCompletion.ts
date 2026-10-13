@@ -2,12 +2,12 @@
 
 import { useMemo } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import type { QuestionnaireSlug } from "@/data/questionnaires";
-import { recordQuestionnaireCompletion } from "@/lib/portalProgress";
+import type { InstrumentSlug } from "@/data/instruments";
+import { recordInstrumentCompletion } from "@/lib/portalProgress";
 import { saveAuthenticatedCompletion } from "@/lib/portalSync";
 
 type CompletionOptions<TResult> = {
-  slug: QuestionnaireSlug;
+  slug: InstrumentSlug | string;
   getPrimaryLabel: (result: TResult) => string | undefined;
 };
 
@@ -20,7 +20,7 @@ export function useQuizCompletion<TResult>({
   return useMemo(
     () => async (result: TResult) => {
       const primaryLabel = getPrimaryLabel(result);
-      const state = recordQuestionnaireCompletion(slug, { primaryLabel });
+      const state = recordInstrumentCompletion(slug, { primaryLabel });
       refreshPortal();
 
       if (user) {
