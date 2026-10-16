@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
 import { Button } from "@/components/Button";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { createClient } from "@/lib/supabase/client";
 import { syncLocalProgressToSupabase } from "@/lib/portalSync";
 
@@ -11,9 +12,10 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/meu-mapa";
+  const oauthError = searchParams.get("error");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(oauthError);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event: FormEvent) {
@@ -45,17 +47,6 @@ function LoginForm() {
     router.push(next);
   }
 
-  async function handleGoogle() {
-    const supabase = createClient();
-    const origin = window.location.origin;
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
-      },
-    });
-  }
-
   return (
     <div className="mx-auto w-full max-w-md px-5 py-16 sm:px-8">
       <div className="space-y-3 text-center">
@@ -65,7 +56,17 @@ function LoginForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-10 space-y-4">
+      <div className="mt-10 space-y-4">
+        <GoogleSignInButton nextPath={next} />
+
+        <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-ink-muted">
+          <span className="h-px flex-1 bg-border" />
+          <span>ou com email</span>
+          <span className="h-px flex-1 bg-border" />
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         <label className="block space-y-2 text-sm">
           <span>Email</span>
           <input
@@ -92,17 +93,6 @@ function LoginForm() {
         </Button>
       </form>
 
-      <div className="mt-4">
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-full"
-          onClick={() => void handleGoogle()}
-        >
-          Continuar com Google
-        </Button>
-      </div>
-
       <div className="mt-6 space-y-2 text-center text-sm text-ink-muted">
         <p>
           <Link href="/recuperar-senha" className="hover:text-ink">
@@ -122,7 +112,11 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="py-24 text-center text-ink-muted">Carregando...</div>}>
+    <Suspense
+      fallback={
+        <div className="py-24 text-center text-ink-muted">Carregando...</div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );

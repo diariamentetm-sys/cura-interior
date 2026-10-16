@@ -15,6 +15,7 @@ const publicItems = [
   { href: "/", label: "Início" },
   { href: "/explorar", label: "Explorar" },
   { href: "/login", label: "Entrar" },
+  { href: "/cadastro", label: "Criar conta" },
 ];
 
 export function MobileNav() {

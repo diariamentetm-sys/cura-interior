@@ -8,7 +8,7 @@ export function InfiniteQuestionnaireSlider() {
   return (
     <section className="border-t border-border" aria-label="Territórios">
       <div className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
-        <p className="section-eyebrow !text-accent-pink mb-6">Por onde começar?</p>
+        <p className="section-eyebrow mb-6">Por onde começar?</p>
         <h2 className="display-xl max-w-3xl text-3xl text-ink sm:text-4xl md:text-5xl">
           Escolha um módulo.
         </h2>

@@ -154,7 +154,7 @@ export default function MeuMapaPage() {
               <li key={instrument.slug}>
                 <Link
                   href={instrument.href}
-                  className="flex items-center justify-between rounded-xl border border-border bg-white px-4 py-3 text-sm transition-opacity hover:opacity-80"
+                  className="flex items-center justify-between rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm transition-opacity hover:opacity-80"
                 >
                   <span className="font-medium text-ink">{instrument.name}</span>
                   <span className="text-ink-muted">

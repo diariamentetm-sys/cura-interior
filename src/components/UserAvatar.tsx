@@ -27,7 +27,7 @@ export function UserAvatar({
 
   return (
     <div
-      className={`relative flex items-center justify-center rounded-full border-[1.5px] border-border bg-white text-accent shadow-[0_12px_40px_-24px_rgba(255,59,46,0.55)] ${sizeClasses[size]}`}
+      className={`relative flex items-center justify-center rounded-full border-[1.5px] border-border bg-bg-elevated text-accent shadow-[0_12px_40px_-24px_rgba(230,57,70,0.45)] ${sizeClasses[size]}`}
       aria-hidden="true"
     >
       {avatarType === "initials" ? (

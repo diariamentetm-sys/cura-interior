@@ -42,7 +42,7 @@ export function ContinueExploring({ excludeId }: ContinueExploringProps) {
         {items.map((item) => (
           <li
             key={item.slug}
-            className="flex flex-col gap-3 rounded-2xl border border-border bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-3 rounded-2xl border border-border bg-bg-elevated p-4 sm:flex-row sm:items-center sm:justify-between"
           >
             <div>
               <p className="font-display text-lg text-ink">{item.name}</p>

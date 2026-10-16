@@ -21,7 +21,7 @@ export function DiscoveryPath() {
           return (
             <article
               key={module.slug}
-              className="flex flex-col rounded-2xl border border-border bg-white p-4 sm:p-5"
+              className="flex flex-col rounded-2xl border border-border bg-bg-elevated p-4 sm:p-5"
             >
               <p className="section-eyebrow mb-3 text-[0.65rem]">
                 Módulo {String(module.order).padStart(2, "0")}

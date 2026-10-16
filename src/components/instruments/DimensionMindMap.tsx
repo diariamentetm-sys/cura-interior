@@ -11,18 +11,18 @@ export function dimensionAnchorId(key: string): string {
   return `resultado-dimensao-${key}`;
 }
 
-/** Cores de marca — sem preto. Centro usa rosa. */
+/** Cores da paleta Intelecto Mágico. Centro = cérebro principal. */
 const NODE_COLORS = [
-  "#ff3b2e",
-  "#2b5bff",
-  "#1fae6c",
-  "#1f4b5f",
-  "#c45c26",
-  "#7c5cff",
+  "#E63946",
+  "#1E73D1",
+  "#6BCB7E",
+  "#B9A7E8",
+  "#FFD34D",
+  "#F89CB0",
 ];
 
-const CENTER_FILL = "#ff4f9a";
-const WHITE = "#ffffff";
+const CENTER_FILL = "#F89CB0";
+const WHITE = "#FFF7F0";
 
 /** Raio do nó = só o percentual do resultado (26px → 64px). */
 function radiusFromPercentage(percentage: number): number {

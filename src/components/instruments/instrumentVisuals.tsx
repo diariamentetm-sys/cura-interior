@@ -11,15 +11,43 @@ export type MotifType =
 
 export const instrumentVisualThemes: Record<
   InstrumentSlug,
-  { panel: string; motif: MotifType }
+  { panel: string; motif: MotifType; thumb?: string }
 > = {
-  "big-five": { panel: "bg-[#ffd8d3]", motif: "rings" },
-  "tipologia-16": { panel: "bg-[#d6e2ff]", motif: "grid" },
-  "perfil-cognitivo": { panel: "bg-[#d4f0e3]", motif: "nodes" },
-  "inteligencia-emocional": { panel: "bg-[#ffd6e8]", motif: "pulse" },
-  "estilos-apego": { panel: "bg-[#e8e2d6]", motif: "orbit" },
-  autoestima: { panel: "bg-[#d5e8ef]", motif: "mirror" },
-  "vocacional-riasec": { panel: "bg-[#f3e9c8]", motif: "paths" },
+  "big-five": {
+    panel: "bg-[#fed6ce]",
+    motif: "rings",
+    thumb: "/images/instruments/big-five-v2.jpg",
+  },
+  "tipologia-16": {
+    panel: "bg-[#a8d1ef]",
+    motif: "grid",
+    thumb: "/images/instruments/tipologia-16.jpg",
+  },
+  "perfil-cognitivo": {
+    panel: "bg-[#0071a9]",
+    motif: "nodes",
+    thumb: "/images/instruments/perfil-cognitivo.jpg",
+  },
+  "inteligencia-emocional": {
+    panel: "bg-[#c5b1e6]",
+    motif: "pulse",
+    thumb: "/images/instruments/inteligencia-emocional.jpg",
+  },
+  "estilos-apego": {
+    panel: "bg-[#fd9e88]",
+    motif: "orbit",
+    thumb: "/images/instruments/estilos-apego.jpg",
+  },
+  autoestima: {
+    panel: "bg-[#9bd6a6]",
+    motif: "mirror",
+    thumb: "/images/instruments/autoestima.jpg",
+  },
+  "vocacional-riasec": {
+    panel: "bg-[#fbe085]",
+    motif: "paths",
+    thumb: "/images/instruments/vocacional-riasec.jpg",
+  },
 };
 
 export function InstrumentMotif({
@@ -203,16 +231,27 @@ export function InstrumentVisualPanel({
 
   return (
     <div
-      className={`overflow-hidden rounded-[1.75rem] border border-border/80 bg-white ${className}`}
+      className={`overflow-hidden rounded-[1.75rem] border border-border/80 bg-bg-elevated ${className}`}
       aria-hidden="true"
     >
       <div
-        className={`flex min-h-[14rem] items-center justify-center px-6 py-10 sm:min-h-[18rem] lg:min-h-[22rem] ${theme.panel}`}
+        className={`relative flex min-h-[14rem] items-center justify-center overflow-hidden sm:min-h-[18rem] lg:min-h-[22rem] ${theme.panel}`}
       >
-        <InstrumentMotif
-          type={theme.motif}
-          className="h-full w-full max-w-sm text-ink/30"
-        />
+        {theme.thumb ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={theme.thumb}
+            alt=""
+            className="h-full w-full object-contain object-center"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center px-6 py-10">
+            <InstrumentMotif
+              type={theme.motif}
+              className="h-full w-full max-w-sm text-ink/30"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -230,6 +269,22 @@ export function InstrumentCardVisual({
 }: InstrumentCardVisualProps) {
   const theme = instrumentVisualThemes[slug];
   if (!theme) return null;
+
+  if (theme.thumb) {
+    return (
+      <div
+        className={`relative shrink-0 overflow-hidden ${theme.panel} ${className}`}
+        aria-hidden="true"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={theme.thumb}
+          alt=""
+          className="h-full w-full object-cover object-center"
+        />
+      </div>
+    );
+  }
 
   return (
     <div

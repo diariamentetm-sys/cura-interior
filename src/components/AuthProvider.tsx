@@ -69,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data ?? {
         display_name:
           current.user_metadata?.full_name ??
+          current.user_metadata?.name ??
           current.email?.split("@")[0] ??
           null,
         avatar_type: "abstract",

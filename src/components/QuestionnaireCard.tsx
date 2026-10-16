@@ -20,7 +20,7 @@ export function QuestionnaireCard({
   stageLabel,
 }: QuestionnaireCardProps) {
   return (
-    <article className="flex overflow-hidden rounded-2xl border border-border bg-white">
+    <article className="flex overflow-hidden rounded-2xl border border-border bg-bg-elevated">
       <InstrumentCardVisual
         slug={questionnaire.slug}
         className="h-auto w-24 self-stretch px-1.5 py-3 sm:w-28 sm:px-2"

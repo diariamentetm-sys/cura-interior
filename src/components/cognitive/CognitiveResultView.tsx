@@ -145,7 +145,7 @@ export function CognitiveResultView() {
             {result.explanations.map((item, index) => (
               <li
                 key={item.questionId}
-                className="rounded-2xl border border-border bg-white p-4 sm:p-5"
+                className="rounded-2xl border border-border bg-bg-elevated p-4 sm:p-5"
               >
                 <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
                   {index + 1}. {CATEGORY_LABELS[item.category]}

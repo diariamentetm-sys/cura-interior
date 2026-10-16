@@ -140,7 +140,7 @@ export function LikertFlow<TResult>({
                   className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 transition-colors ${
                     active
                       ? "border-accent bg-accent/5"
-                      : "border-border bg-white hover:border-ink/20"
+                      : "border-border bg-bg-elevated hover:border-ink/20"
                   }`}
                 >
                   <input

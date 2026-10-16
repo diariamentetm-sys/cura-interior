@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { InstrumentMeta } from "@/data/instruments";
 import {
@@ -17,7 +18,7 @@ export function InstrumentMagazineCard({
   return (
     <Link
       href={instrument.href}
-      className="group flex min-h-[22rem] flex-col overflow-hidden rounded-[1.75rem] border border-border/80 bg-white transition duration-300 hover:-translate-y-1 hover:border-ink/20 sm:min-h-[24rem]"
+      className="group flex min-h-[22rem] flex-col overflow-hidden rounded-[1.75rem] border border-border/80 bg-bg-elevated transition duration-300 hover:-translate-y-1 hover:border-ink/20 sm:min-h-[24rem]"
     >
       <div className="flex flex-1 flex-col gap-4 p-5 sm:p-6">
         <div className="flex items-start justify-between gap-3">
@@ -53,9 +54,21 @@ export function InstrumentMagazineCard({
         </div>
       </div>
       <div
-        className={`relative flex h-36 items-end justify-center px-4 pb-2 sm:h-40 ${theme.panel}`}
+        className={`relative flex h-36 items-end justify-center overflow-hidden sm:h-40 ${theme.panel}`}
       >
-        <InstrumentMotif type={theme.motif} />
+        {theme.thumb ? (
+          <Image
+            src={theme.thumb}
+            alt=""
+            fill
+            className="object-contain object-center transition duration-300 group-hover:scale-[1.03]"
+            sizes="(max-width: 640px) 100vw, 33vw"
+          />
+        ) : (
+          <div className="flex h-full w-full items-end justify-center px-4 pb-2">
+            <InstrumentMotif type={theme.motif} />
+          </div>
+        )}
       </div>
     </Link>
   );

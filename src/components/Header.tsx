@@ -15,6 +15,7 @@ export function Header() {
     !pathname?.startsWith("/explorar");
 
   const publicLinks = [
+    { href: "/#como-funciona", label: "Como funciona" },
     { href: "/#territorios", label: "Territórios" },
     { href: "/explorar", label: "Explorar" },
   ];
@@ -28,11 +29,11 @@ export function Header() {
   const links = user ? authLinks : publicLinks;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/80 bg-bg/85 backdrop-blur-md">
+    <header className="site-header sticky top-0 z-40">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
         <Link
           href={user ? "/meu-mapa" : "/"}
-          className="font-display text-xl text-ink transition-opacity hover:opacity-80 sm:text-2xl"
+          className="font-display text-xl text-cream transition-opacity hover:opacity-80 sm:text-2xl"
         >
           Cura Interior
         </Link>
@@ -52,8 +53,8 @@ export function Header() {
                         href={link.href}
                         className={`rounded-full px-3 py-2 text-sm font-medium transition-colors ${
                           isActive
-                            ? "text-accent"
-                            : "text-ink-muted hover:text-ink"
+                            ? "text-accent-yellow"
+                            : "text-cream/80 hover:text-cream"
                         }`}
                         aria-current={isActive ? "page" : undefined}
                       >
@@ -69,12 +70,15 @@ export function Header() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/login"
-                  className="hidden px-2 py-2 text-sm font-medium text-ink-muted transition-colors hover:text-ink sm:inline"
+                  className="hidden px-2 py-2 text-sm font-medium text-cream/80 transition-colors hover:text-cream sm:inline"
                 >
                   Entrar
                 </Link>
-                <Button href="/cadastro" className="!min-h-10 !px-5 !text-xs">
-                  Começar
+                <Button
+                  href="/cadastro"
+                  className="!min-h-10 !bg-cream !px-5 !text-xs !text-ink hover:!bg-white"
+                >
+                  Criar conta
                 </Button>
               </div>
             )}

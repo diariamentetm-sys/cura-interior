@@ -63,7 +63,7 @@ export function JungSketch({
           length = 120;
         }
 
-        path.setAttribute("stroke", "#cecece");
+        path.setAttribute("stroke", "#B9A7E8");
         path.setAttribute("stroke-width", "1.75");
         path.setAttribute("stroke-linecap", "round");
         path.setAttribute("stroke-linejoin", "round");
@@ -71,15 +71,15 @@ export function JungSketch({
         path.style.strokeDasharray = `${length}`;
 
         if (reduceMotion) {
-          path.style.fill = "#cecece";
+          path.style.fill = "#B9A7E8";
           path.style.stroke = "none";
           path.style.strokeDashoffset = "0";
           return;
         }
 
         // Ghost fill keeps the silhouette alive while strokes redraw.
-        path.style.fill = "rgba(206, 206, 206, 0.16)";
-        path.style.stroke = "#cecece";
+        path.style.fill = "rgba(185, 167, 232, 0.18)";
+        path.style.stroke = "#B9A7E8";
         path.style.strokeDashoffset = `${length}`;
         path.style.animation = `jung-stroke-loop ${cycleSeconds}s ease-in-out infinite`;
         // Negative delay spreads paths across the cycle so the drawing never blanks out.

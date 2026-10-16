@@ -22,7 +22,7 @@ export function InnerMap({ statuses }: InnerMapProps) {
         return (
           <li
             key={instrument.slug}
-            className="flex items-center gap-2 rounded-xl border border-border bg-white px-4 py-3 text-sm text-ink"
+            className="flex items-center gap-2 rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-ink"
           >
             <StatusMark status={status} />
             <span>{instrument.name}</span>

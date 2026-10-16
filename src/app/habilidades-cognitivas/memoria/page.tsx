@@ -116,7 +116,7 @@ export default function CognitiveMemoryPage() {
                   id="memory-input"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-lg tracking-widest text-ink outline-none focus-visible:ring-2 focus-visible:ring-accent-blue"
+                  className="w-full rounded-xl border border-border bg-bg-elevated px-4 py-3 text-lg tracking-widest text-ink outline-none focus-visible:ring-2 focus-visible:ring-accent-blue"
                   inputMode="numeric"
                   autoComplete="off"
                 />

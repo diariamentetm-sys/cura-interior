@@ -48,7 +48,7 @@ export default function SombraIntroPage() {
             },
           ].map((item) => (
             <li key={item.step} className="flex gap-4">
-              <span className="stage-number text-3xl text-accent-pink">
+              <span className="stage-number text-3xl text-hero">
                 {item.step}
               </span>
               <div className="space-y-1 pt-1">

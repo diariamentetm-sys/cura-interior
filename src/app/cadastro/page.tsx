@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/Button";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { createClient } from "@/lib/supabase/client";
 import { syncLocalProgressToSupabase } from "@/lib/portalSync";
 
@@ -55,16 +56,6 @@ export default function CadastroPage() {
     );
   }
 
-  async function handleGoogle() {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/meu-mapa`,
-      },
-    });
-  }
-
   return (
     <div className="mx-auto w-full max-w-md px-5 py-16 sm:px-8">
       <div className="space-y-3 text-center">
@@ -74,7 +65,20 @@ export default function CadastroPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-10 space-y-4">
+      <div className="mt-10 space-y-4">
+        <GoogleSignInButton
+          nextPath="/meu-mapa"
+          label="Criar conta com Google"
+        />
+
+        <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-ink-muted">
+          <span className="h-px flex-1 bg-border" />
+          <span>ou com email</span>
+          <span className="h-px flex-1 bg-border" />
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         <label className="block space-y-2 text-sm">
           <span>Nome</span>
           <input
@@ -111,17 +115,6 @@ export default function CadastroPage() {
           {loading ? "Criando..." : "Criar conta"}
         </Button>
       </form>
-
-      <div className="mt-4">
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-full"
-          onClick={() => void handleGoogle()}
-        >
-          Continuar com Google
-        </Button>
-      </div>
 
       <p className="mt-6 text-center text-sm text-ink-muted">
         Já tem conta?{" "}

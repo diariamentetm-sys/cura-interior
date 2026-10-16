@@ -46,7 +46,7 @@ export default function CognitiveIntroPage() {
           {COGNITIVE_CATEGORIES.map((category) => (
             <li
               key={category}
-              className="rounded-xl border border-border bg-white px-4 py-3 text-sm text-ink"
+              className="rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-ink"
             >
               {CATEGORY_LABELS[category]}
             </li>

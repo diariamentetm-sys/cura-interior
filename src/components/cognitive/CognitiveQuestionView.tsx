@@ -51,7 +51,7 @@ export function CognitiveQuestionView({
               className={`flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3 transition-colors ${
                 selected
                   ? "border-accent bg-accent/5"
-                  : "border-border bg-white hover:border-ink/25"
+                  : "border-border bg-bg-elevated hover:border-ink/25"
               }`}
             >
               <input

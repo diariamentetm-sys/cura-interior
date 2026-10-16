@@ -4,12 +4,46 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/meu-mapa";
+  const oauthError = searchParams.get("error");
+  const oauthDescription = searchParams.get("error_description");
+
+  let next = searchParams.get("next") ?? "/meu-mapa";
+  if (!next.startsWith("/")) {
+    next = "/meu-mapa";
+  }
+
+  if (oauthError) {
+    const message = encodeURIComponent(
+      oauthDescription || "Não foi possível concluir o login com Google.",
+    );
+    return NextResponse.redirect(
+      `${origin}/login?error=${message}&next=${encodeURIComponent(next)}`,
+    );
+  }
 
   if (code) {
     const supabase = await createClient();
-    await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (!error) {
+      const forwardedHost = request.headers.get("x-forwarded-host");
+      const isLocalEnv = process.env.NODE_ENV === "development";
+
+      if (isLocalEnv) {
+        return NextResponse.redirect(`${origin}${next}`);
+      }
+
+      if (forwardedHost) {
+        return NextResponse.redirect(`https://${forwardedHost}${next}`);
+      }
+
+      return NextResponse.redirect(`${origin}${next}`);
+    }
   }
 
-  return NextResponse.redirect(`${origin}${next}`);
+  return NextResponse.redirect(
+    `${origin}/login?error=${encodeURIComponent(
+      "Não foi possível validar o login com Google. Tente novamente.",
+    )}&next=${encodeURIComponent(next)}`,
+  );
 }
