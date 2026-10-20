@@ -6,6 +6,7 @@ import { Button } from "@/components/Button";
 import { HeroScene } from "@/components/HeroScene";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
 import { MagazineModuleSection } from "@/components/MagazineModuleSection";
+import { MentalGymTeaser } from "@/components/mapa/MentalGymTeaser";
 import { useAuth } from "@/components/AuthProvider";
 import { modules } from "@/data/instruments";
 
@@ -35,22 +36,31 @@ export default function HomePage() {
         <div className="relative z-20 mx-auto flex min-h-[min(100svh,920px)] w-full max-w-6xl items-center px-5 py-14 sm:px-8 sm:py-16 lg:py-20">
           <div className="hero-copy max-w-[22rem] text-left sm:max-w-xl lg:max-w-2xl">
             <h1 className="hero-title display-xl text-cream">
-              <span className="hero-title-line">Quem se conhece,</span>
-              <span className="hero-title-line">escolhe melhor o</span>
+              <span className="hero-title-line">Conheça sua mente.</span>
               <span className="hero-title-line">
-                próprio <span className="text-accent-yellow">caminho.</span>
+                Explore seu{" "}
+                <span className="text-accent-yellow">potencial.</span>
               </span>
             </h1>
-            <p className="mt-7 max-w-md text-lg leading-relaxed text-cream/90 sm:text-xl lg:max-w-lg">
-              Um espaço para se conhecer com leveza — explorar quem você é, como
-              sente e o que te move.
+            <p className="mt-7 max-w-lg text-base leading-relaxed text-cream/90 sm:text-lg lg:max-w-xl">
+              Descubra mais sobre sua personalidade, emoções e comportamentos
+              com testes de autoconhecimento. Exercite também sua memória,
+              atenção e raciocínio com jogos e desafios cognitivos, no seu
+              ritmo.
             </p>
-            <div className="mt-10">
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Button
                 href="#territorios"
                 className="!bg-cream !text-ink shadow-[0_12px_32px_-12px_rgba(44,36,32,0.45)] hover:!bg-white hover:!text-ink focus-visible:!outline-cream"
               >
-                Faça seu primeiro teste
+                Explorar os testes
+              </Button>
+              <Button
+                href="#ginastica-mental"
+                variant="secondary"
+                className="!border-cream/50 !text-cream hover:!border-cream hover:!bg-cream/10 focus-visible:!outline-cream"
+              >
+                Exercitar minha mente
               </Button>
             </div>
           </div>
@@ -69,6 +79,12 @@ export default function HomePage() {
             <MagazineModuleSection module={module} />
           </div>
         ))}
+      </div>
+
+      <div id="ginastica-mental" className="scroll-mt-24 border-t border-border">
+        <div className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-8 sm:py-16 lg:py-20">
+          <MentalGymTeaser />
+        </div>
       </div>
     </div>
   );

@@ -799,6 +799,63 @@ body {
   }
 }
 
+@keyframes intelecto-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes intelecto-celebrate {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(-3deg);
+  }
+  75% {
+    transform: translateY(-6px) rotate(3deg);
+  }
+}
+
+@keyframes intelecto-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(-4deg);
+  }
+  60% {
+    transform: rotate(4deg);
+  }
+}
+
+.intelecto-mood-welcome {
+  animation: intelecto-wave 2.8s ease-in-out infinite;
+  transform-origin: 50% 80%;
+}
+
+.intelecto-mood-discovery {
+  animation: intelecto-bob 3.2s ease-in-out infinite;
+}
+
+.intelecto-mood-achievement {
+  animation: intelecto-celebrate 1.8s ease-in-out infinite;
+}
+
+.intelecto-mood-return {
+  animation: intelecto-bob 4s ease-in-out infinite;
+}
+
+.intelecto-mood-complete {
+  animation: intelecto-celebrate 2.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -809,7 +866,12 @@ body {
   .mind-map-branch,
   .mind-map-node-float,
   .mind-map-center-float,
-  .dimension-target-flash {
+  .dimension-target-flash,
+  .intelecto-mood-welcome,
+  .intelecto-mood-discovery,
+  .intelecto-mood-achievement,
+  .intelecto-mood-return,
+  .intelecto-mood-complete {
     animation: none;
   }
 

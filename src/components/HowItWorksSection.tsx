@@ -1,21 +1,21 @@
 const steps = [
   {
     number: "01",
-    title: "Responda e veja o mapa crescer",
+    title: "Descubra",
     description:
-      "A cada questionário, seus resultados entram no mapa mental — um panorama vivo de quem você é, como sente e o que te move.",
+      "Faça os testes de autoconhecimento e veja seus resultados entrarem no mapa. Cada descoberta pode abrir novos caminhos.",
   },
   {
     number: "02",
-    title: "Refaça quando fizer sentido",
+    title: "Pratique",
     description:
-      "Nada é definitivo. Você pode repetir qualquer teste sempre que quiser atualizar o olhar sobre si.",
+      "Seus resultados podem ajudar a sugerir atividades relacionadas às habilidades que você deseja exercitar — memória, atenção, raciocínio e mais.",
   },
   {
     number: "03",
-    title: "Compartilhe com quem quiser",
+    title: "Continue explorando",
     description:
-      "Seus resultados são seus. Envie para quem fizer sentido — ou guarde só para você.",
+      "Prefere começar pelos jogos? Tudo bem também. Explore os desafios livremente, sem precisar realizar nenhum teste antes.",
   },
 ] as const;
 
@@ -29,12 +29,13 @@ export function HowItWorksSection() {
         <header className="max-w-2xl space-y-4 animate-fade-up">
           <p className="section-eyebrow">Como funciona</p>
           <h2 className="display-xl text-4xl text-ink sm:text-5xl md:text-[3.25rem]">
-            Questionários que viram um{" "}
-            <span className="text-hero">mapa mental.</span>
+            Descubra. Pratique.{" "}
+            <span className="text-hero">Continue explorando.</span>
           </h2>
           <p className="max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg">
-            Sem trilha obrigatória. Você escolhe o ritmo — e o mapa acompanha
-            cada descoberta.
+            Cada descoberta pode abrir novos caminhos. Seus resultados podem
+            ajudar a sugerir atividades relacionadas às habilidades que você
+            deseja exercitar.
           </p>
         </header>
 

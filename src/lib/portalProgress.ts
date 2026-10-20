@@ -2,6 +2,8 @@ import { badges, type BadgeSlug } from "@/data/badges";
 import {
   instruments,
   getInstrument,
+  getInstrumentsForModule,
+  modules,
   type DiscoveryStatus,
   type InstrumentSlug,
 } from "@/data/instruments";
@@ -198,19 +200,21 @@ export function getDiscoveryLevel(completions: LocalCompletion[]): number {
       .map((c) => c.slug)
       .filter((slug) => instruments.some((i) => i.slug === slug)),
   );
-  return Math.min(5, known.size);
+  return Math.min(instruments.length, known.size);
 }
 
 export function getDiscoveryLevelMessage(level: number): string {
   const messages: Record<number, string> = {
     0: "Todo mapa começa com um primeiro ponto.",
     1: "Uma avaliação já faz parte do seu mapa.",
-    2: "Duas dimensões exploradas — o painel começa a ganhar forma.",
+    2: "Duas dimensões exploradas — o mapa começa a ganhar forma.",
     3: "Três avaliações registradas. Continue no seu ritmo.",
     4: "Quatro dimensões exploradas no mapa.",
-    5: "Cinco ou mais avaliações no seu painel.",
+    5: "Cinco avaliações no seu universo.",
+    6: "Quase lá — o mapa está quase completo.",
+    7: "As sete avaliações atuais já fazem parte do seu mapa.",
   };
-  return messages[level] ?? messages[0];
+  return messages[Math.min(level, 7)] ?? messages[0];
 }
 
 export function getInstrumentStatus(
@@ -226,6 +230,20 @@ export function getInstrumentStatus(
 export const getQuestionnaireStatus = getInstrumentStatus;
 
 export function getNextRecommended(state: PortalState): InstrumentSlug | null {
+  for (const module of modules) {
+    const list = getInstrumentsForModule(module.slug);
+    const knownCount = list.filter((instrument) =>
+      state.completions.some((item) => item.slug === instrument.slug),
+    ).length;
+    if (knownCount > 0 && knownCount < list.length) {
+      const next = list.find(
+        (instrument) =>
+          !state.completions.some((item) => item.slug === instrument.slug),
+      );
+      if (next) return next.slug;
+    }
+  }
+
   for (const instrument of instruments) {
     if (!state.completions.some((item) => item.slug === instrument.slug)) {
       return instrument.slug;
@@ -238,10 +256,15 @@ export function computeUnlockedBadges(
   completions: LocalCompletion[],
   visitDays: string[],
 ): BadgeSlug[] {
+  const uniqueCount = new Set(
+    completions
+      .map((item) => item.slug)
+      .filter((slug) => instruments.some((item) => item.slug === slug)),
+  ).size;
   const unlocked: BadgeSlug[] = [];
 
   for (const badge of badges) {
-    if (badge.requiresCount && completions.length >= badge.requiresCount) {
+    if (badge.requiresCount && uniqueCount >= badge.requiresCount) {
       unlocked.push(badge.slug);
       continue;
     }

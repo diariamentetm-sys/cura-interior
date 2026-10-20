@@ -2,6 +2,7 @@ export type BadgeSlug =
   | "primeiro-olhar"
   | "explorador"
   | "cinco-dimensoes"
+  | "universo-explorado"
   | "sem-pressa";
 
 export type BadgeMeta = {
@@ -34,6 +35,13 @@ export const badges: BadgeMeta[] = [
     message: "Cinco avaliações concluídas no Meu Mapa.",
     symbol: "✧",
     requiresCount: 5,
+  },
+  {
+    slug: "universo-explorado",
+    name: "Universo Explorado",
+    message: "Você concluiu as sete avaliações disponíveis.",
+    symbol: "✶",
+    requiresCount: 7,
   },
   {
     slug: "sem-pressa",
