@@ -42,7 +42,7 @@ export function LivingMap({ territories, portal }: LivingMapProps) {
     territories[0];
 
   return (
-    <section className="space-y-8" aria-labelledby={`${groupId}-title`}>
+    <section className="w-full space-y-8" aria-labelledby={`${groupId}-title`}>
       <header className="mx-auto max-w-xl space-y-3 text-center">
         <p className="section-eyebrow">Mapa Vivo</p>
         <h2
@@ -57,28 +57,26 @@ export function LivingMap({ territories, portal }: LivingMapProps) {
         </p>
       </header>
 
-      <ol
-        className="relative mx-auto max-w-lg list-none space-y-0 px-2"
-        aria-label="Caminho dos territórios"
-      >
-        <div
-          className="pointer-events-none absolute top-8 bottom-8 left-1/2 w-0 -translate-x-1/2 border-l-2 border-dotted border-border"
-          aria-hidden="true"
-        />
+      <div className="w-full overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ol
+          className="relative flex min-w-full list-none items-start justify-between gap-2 px-1 sm:gap-3"
+          aria-label="Caminho dos territórios"
+        >
+          <div
+            className="pointer-events-none absolute top-8 right-8 left-8 h-0 border-t-2 border-dotted border-border sm:top-9 sm:right-10 sm:left-10"
+            aria-hidden="true"
+          />
 
-        {territories.map((territory, index) => {
-          const status = getPathStepStatus(territories, index);
-          const isSelected = territory.module.slug === selected?.module.slug;
-          const shortName = getShortTerritoryName(territory.module.slug);
-          const label = getPathStepLabel(status, territory);
-          const onRight = index % 2 === 0;
+          {territories.map((territory, index) => {
+            const status = getPathStepStatus(territories, index);
+            const isSelected = territory.module.slug === selected?.module.slug;
+            const shortName = getShortTerritoryName(territory.module.slug);
+            const label = getPathStepLabel(status, territory);
 
-          return (
-            <li key={territory.module.slug} className="relative py-4">
-              <div
-                className={`flex items-center ${
-                  onRight ? "justify-start pl-[calc(50%-2rem)]" : "justify-end pr-[calc(50%-2rem)]"
-                }`}
+            return (
+              <li
+                key={territory.module.slug}
+                className="relative z-[1] flex min-w-[5.5rem] flex-1 flex-col items-center sm:min-w-0"
               >
                 <button
                   type="button"
@@ -86,9 +84,9 @@ export function LivingMap({ territories, portal }: LivingMapProps) {
                   aria-pressed={isSelected}
                   aria-label={`${shortName}: ${territory.completedCount} de ${territory.totalCount}, ${label}`}
                   onClick={() => setSelectedSlug(territory.module.slug)}
-                  className={`relative z-[1] flex max-w-[min(100%,18rem)] items-center gap-3 rounded-2xl p-1 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hero ${
-                    onRight ? "flex-row" : "flex-row-reverse text-right"
-                  } ${isSelected ? "opacity-100" : "opacity-95 hover:opacity-100"}`}
+                  className={`flex w-full max-w-[9.5rem] flex-col items-center gap-2.5 rounded-2xl p-1 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hero ${
+                    isSelected ? "opacity-100" : "opacity-95 hover:opacity-100"
+                  }`}
                 >
                   <span
                     className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-bold shadow-sm transition duration-300 sm:h-[4.5rem] sm:w-[4.5rem] sm:text-2xl ${
@@ -105,20 +103,20 @@ export function LivingMap({ territories, portal }: LivingMapProps) {
                       <span aria-hidden="true">{index + 1}</span>
                     )}
                   </span>
-                  <span className="min-w-0">
-                    <span className="block font-display text-lg text-ink sm:text-xl">
+                  <span className="min-w-0 px-0.5">
+                    <span className="block font-display text-sm leading-tight text-ink sm:text-base md:text-lg">
                       {shortName}
                     </span>
-                    <span className="block text-xs text-ink-muted sm:text-sm">
+                    <span className="mt-0.5 block text-[0.65rem] leading-snug text-ink-muted sm:text-xs">
                       {territory.completedCount}/{territory.totalCount} · {label}
                     </span>
                   </span>
                 </button>
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
 
       {selected ? (
         <div
@@ -150,7 +148,7 @@ export function LivingMap({ territories, portal }: LivingMapProps) {
             )}
           </div>
 
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {selected.instruments.map((instrument) => {
               const status = getInstrumentStatus(instrument.slug, portal);
               return (

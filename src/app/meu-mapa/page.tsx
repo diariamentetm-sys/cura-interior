@@ -59,10 +59,9 @@ export default function MeuMapaPage() {
         intelectoLine={intelectoLine}
       />
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start">
-        <LivingMap territories={territories} portal={portal} />
-        <NextObjectiveCard discovery={discovery} nextBadge={nextBadge} />
-      </div>
+      <LivingMap territories={territories} portal={portal} />
+
+      <NextObjectiveCard discovery={discovery} nextBadge={nextBadge} />
 
       <AchievementGallery items={badgeProgress} />
 
