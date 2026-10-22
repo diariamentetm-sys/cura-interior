@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { AssessmentNavBar } from "@/components/instruments/AssessmentNavBar";
 import type { LikertAnswer, LikertItem, LikertValue } from "@/types/likert";
@@ -41,8 +41,6 @@ export function LikertFlow<TResult>({
   const [hydrated, setHydrated] = useState(false);
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<LikertAnswer[]>([]);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const startedAt = useRef<number | null>(null);
 
   const total = items.length;
   const item = items[index];
@@ -57,16 +55,6 @@ export function LikertFlow<TResult>({
     }
     setHydrated(true);
   }, [namespace, total]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    if (startedAt.current == null) startedAt.current = Date.now();
-    const timer = window.setInterval(() => {
-      if (startedAt.current == null) return;
-      setElapsedSeconds(Math.floor((Date.now() - startedAt.current) / 1000));
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, [hydrated]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -155,8 +143,6 @@ export function LikertFlow<TResult>({
       <AssessmentNavBar
         current={index + 1}
         total={total}
-        elapsedSeconds={elapsedSeconds}
-        isLast={isLast}
         pending={isPending}
         backDisabled={index === 0}
         nextDisabled={selected == null}

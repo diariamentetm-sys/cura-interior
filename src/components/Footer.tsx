@@ -1,6 +1,13 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { isAssessmentPath } from "@/lib/assessmentRoute";
 
 export function Footer() {
+  const pathname = usePathname();
+  if (isAssessmentPath(pathname)) return null;
+
   return (
     <footer className="mt-auto border-t border-border pb-20 sm:pb-0">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:py-12">

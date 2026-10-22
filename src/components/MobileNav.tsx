@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { isAssessmentPath } from "@/lib/assessmentRoute";
 
 const authItems = [
   { href: "/meu-mapa", label: "Mapa" },
@@ -22,8 +23,7 @@ export function MobileNav() {
   const pathname = usePathname();
   const { user } = useAuth();
 
-  // Esconde quando há barra CTA fixa (intro, questionário, resultado).
-  if (pathname?.includes("/questionario")) return null;
+  if (isAssessmentPath(pathname)) return null;
   if (pathname?.includes("/resultado")) return null;
   if (/^\/instrumentos\/[^/]+$/.test(pathname ?? "")) return null;
 

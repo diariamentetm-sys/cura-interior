@@ -27,8 +27,6 @@ export function CognitiveAssessmentFlow() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const questionStartedAt = useRef<number>(Date.now());
-  const sessionStartedAt = useRef<number>(Date.now());
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   const bootstrap = useCallback(async () => {
     setLoading(true);
@@ -93,15 +91,6 @@ export function CognitiveAssessmentFlow() {
   useEffect(() => {
     void bootstrap();
   }, [bootstrap]);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setElapsedSeconds(
-        Math.floor((Date.now() - sessionStartedAt.current) / 1000),
-      );
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -264,8 +253,6 @@ export function CognitiveAssessmentFlow() {
       <AssessmentNavBar
         current={index + 1}
         total={total}
-        elapsedSeconds={elapsedSeconds}
-        isLast={index >= total - 1}
         pending={submitting}
         backDisabled={index === 0}
         nextDisabled={!selectedId}
