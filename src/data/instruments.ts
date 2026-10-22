@@ -190,17 +190,70 @@ export function getInstrumentsForModule(moduleSlug: ModuleSlug): InstrumentMeta[
   return instruments.filter((item) => item.moduleSlug === moduleSlug);
 }
 
-/** Sugere outro instrumento — prioriza os ainda não concluídos. */
+const relatedInstruments: Record<InstrumentSlug, InstrumentSlug[]> = {
+  "big-five": ["tipologia-16", "autoestima"],
+  "tipologia-16": ["big-five", "inteligencia-emocional"],
+  "perfil-cognitivo": ["inteligencia-emocional"],
+  "inteligencia-emocional": ["estilos-apego", "autoestima"],
+  "estilos-apego": ["inteligencia-emocional", "autoestima"],
+  "autoestima": ["estilos-apego", "inteligencia-emocional"],
+  "vocacional-riasec": ["big-five", "autoestima"],
+};
+
+const suggestionReasons: Record<string, string> = {
+  "big-five:tipologia-16":
+    "Os dois olham para personalidade com modelos diferentes: traços amplos e preferências tipológicas.",
+  "big-five:autoestima":
+    "Traços de personalidade e a avaliação que você faz de si costumam se iluminar mutuamente.",
+  "tipologia-16:big-five":
+    "Depois das preferências tipológicas, os cinco grandes traços descrevem tendências sem encaixar você num tipo.",
+  "tipologia-16:inteligencia-emocional":
+    "O modo de decidir e se organizar conversa com a forma como você percebe e regula emoções.",
+  "perfil-cognitivo:inteligencia-emocional":
+    "O perfil desta sessão descreve tarefas de raciocínio. A inteligência emocional observa como você lida com afetos — outra habilidade, não uma confirmação do desempenho.",
+  "inteligencia-emocional:estilos-apego":
+    "Perceber e regular emoções se relaciona com o modo de buscar proximidade nos vínculos.",
+  "inteligencia-emocional:autoestima":
+    "A relação com as próprias emoções e a avaliação global de si aparecem juntas no dia a dia.",
+  "estilos-apego:inteligencia-emocional":
+    "Padrões de vínculo ficam mais legíveis quando você também observa como nomeia e regula emoções.",
+  "estilos-apego:autoestima":
+    "A forma de se aproximar das pessoas e a forma de se avaliar costumam se influenciar.",
+  "autoestima:estilos-apego":
+    "A avaliação de si aparece com frequência na forma de pedir proximidade ou manter distância.",
+  "autoestima:inteligencia-emocional":
+    "Autoestima e percepção emocional descrevem facetas diferentes da relação consigo.",
+  "vocacional-riasec:big-five":
+    "Interesses profissionais não são personalidade. Os traços amplos ajudam a distinguir o que atrai do jeito de agir.",
+  "vocacional-riasec:autoestima":
+    "Interesse por uma área não mede valor pessoal. A autoestima observa essa outra pergunta.",
+};
+
+/** Sugere outra avaliação com relação temática. Prioriza as ainda não concluídas. */
 export function getSuggestedInstrument(
   currentSlug: InstrumentSlug,
   completedSlugs: Iterable<string> = [],
 ): InstrumentMeta {
   const completed = new Set(completedSlugs);
-  const others = instruments.filter((item) => item.slug !== currentSlug);
-  const unexplored = others.find((item) => !completed.has(item.slug));
+  const related = (relatedInstruments[currentSlug] ?? [])
+    .map((slug) => instruments.find((item) => item.slug === slug))
+    .filter((item): item is InstrumentMeta => Boolean(item));
+  const unexplored = related.find((item) => !completed.has(item.slug));
   if (unexplored) return unexplored;
-  const currentIndex = instruments.findIndex((item) => item.slug === currentSlug);
-  return others[0] ?? instruments[(currentIndex + 1) % instruments.length]!;
+  if (related[0]) return related[0];
+
+  const others = instruments.filter((item) => item.slug !== currentSlug);
+  return others[0] ?? instruments[0]!;
+}
+
+export function getSuggestionReason(
+  currentSlug: InstrumentSlug,
+  suggestedSlug: InstrumentSlug,
+): string {
+  return (
+    suggestionReasons[`${currentSlug}:${suggestedSlug}`] ??
+    "Esta avaliação conversa com o tema que você acabou de explorar."
+  );
 }
 
 export function getStatusLabel(status: DiscoveryStatus): string {

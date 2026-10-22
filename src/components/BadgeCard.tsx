@@ -1,3 +1,4 @@
+import { MedalMark } from "@/components/mapa/MedalMark";
 import { badges, type BadgeSlug } from "@/data/badges";
 
 type BadgeCardProps = {
@@ -16,16 +17,11 @@ export function BadgeCard({ slug, unlocked, unlockedAt }: BadgeCardProps) {
         unlocked ? "" : "opacity-45"
       }`}
     >
-      <div
-        className={`flex h-14 w-14 items-center justify-center rounded-full border text-xl ${
-          unlocked
-            ? "border-accent/30 bg-accent/5 text-accent"
-            : "border-border text-ink-muted"
-        }`}
-        aria-hidden="true"
-      >
-        {badge.symbol}
-      </div>
+      <MedalMark
+        symbol={badge.symbol}
+        unlocked={unlocked}
+        label={badge.name}
+      />
       <div className="space-y-1">
         <h3 className="font-display text-xl text-ink">{badge.name}</h3>
         <p className="text-sm leading-relaxed text-ink-muted">{badge.message}</p>

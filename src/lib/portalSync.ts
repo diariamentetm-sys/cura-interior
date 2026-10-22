@@ -88,7 +88,7 @@ export async function saveAuthenticatedCompletion(options: {
   const supabase = createClient();
   const { userId, slug, result, state } = options;
 
-  await supabase.from("cura_questionnaire_results").insert({
+  const inserted = await supabase.from("cura_questionnaire_results").insert({
     user_id: userId,
     questionnaire_slug: slug,
     questionnaire_version: "1.0.0",
@@ -96,13 +96,17 @@ export async function saveAuthenticatedCompletion(options: {
     raw_answers: result.answers ?? [],
     normalized_scores:
       result.normalizedScores ?? result.normalizedPoleScores ?? {},
-    primary_result: result.primary ?? {},
+    primary_result: result.primary ?? result.primaryLabel ?? {},
     secondary_results:
       result.complementary ?? result.secondary ?? result.complementaryNeeds ?? [],
     full_result: result,
   });
 
-  await supabase.from("cura_user_progress").upsert({
+  if (inserted.error) {
+    throw new Error(inserted.error.message);
+  }
+
+  const progress = await supabase.from("cura_user_progress").upsert({
     user_id: userId,
     completed_questionnaires: state.completions.map((item) => item.slug),
     discovery_level: getDiscoveryLevel(state.completions),
@@ -111,13 +115,20 @@ export async function saveAuthenticatedCompletion(options: {
     updated_at: new Date().toISOString(),
   });
 
+  if (progress.error) {
+    throw new Error(progress.error.message);
+  }
+
   for (const badge of state.unlockedBadges as BadgeSlug[]) {
-    await supabase.from("cura_user_badges").upsert(
+    const savedBadge = await supabase.from("cura_user_badges").upsert(
       {
         user_id: userId,
         badge_slug: badge,
       },
       { onConflict: "user_id,badge_slug" },
     );
+    if (savedBadge.error) {
+      throw new Error(savedBadge.error.message);
+    }
   }
 }

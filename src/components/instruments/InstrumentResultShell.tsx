@@ -1,13 +1,20 @@
 import type { ReactNode } from "react";
 import { ShareResultCta } from "@/components/ShareResultCta";
-import { InstrumentActionBar } from "@/components/instruments/InstrumentActionBar";
+import { AssessmentReferences } from "@/components/instruments/AssessmentReferences";
+import {
+  AssessmentResultActions,
+  type ResultSaveStatus,
+} from "@/components/instruments/AssessmentResultActions";
+import { ResultIllustrationSlot } from "@/components/instruments/ResultIllustrationSlot";
 import {
   DimensionMindMap,
   dimensionAnchorId,
 } from "@/components/instruments/DimensionMindMap";
+import type { InstrumentSlug } from "@/data/instruments";
 import type { DimensionScore } from "@/types/likert";
 
 type InstrumentResultShellProps = {
+  slug: InstrumentSlug;
   eyebrow: string;
   title: string;
   disclaimer: string;
@@ -19,13 +26,15 @@ type InstrumentResultShellProps = {
   shareHref?: string;
   suggestHref: string;
   suggestName: string;
-  onSave?: () => void;
-  saveLabel?: string;
-  saveDisabled?: boolean;
+  suggestReason: string;
+  saveStatus: ResultSaveStatus;
+  accountHref: string;
+  onRetrySave?: () => void;
   children?: ReactNode;
 };
 
 export function InstrumentResultShell({
+  slug,
   eyebrow,
   title,
   disclaimer,
@@ -37,9 +46,10 @@ export function InstrumentResultShell({
   shareHref,
   suggestHref,
   suggestName,
-  onSave,
-  saveLabel = "Salvar no Meu Mapa",
-  saveDisabled = false,
+  suggestReason,
+  saveStatus,
+  accountHref,
+  onRetrySave,
   children,
 }: InstrumentResultShellProps) {
   const hasAnalyses = dimensions?.some((dim) => Boolean(dim.analysis));
@@ -47,7 +57,7 @@ export function InstrumentResultShell({
 
   return (
     <>
-      <div className="mx-auto w-full max-w-3xl space-y-10 px-5 pb-44 pt-12 sm:px-8 sm:pb-40 sm:py-16">
+      <div className="mx-auto w-full max-w-3xl space-y-10 px-5 py-12 sm:px-8 sm:py-16">
         <header className="space-y-4">
           <p className="section-eyebrow">{eyebrow}</p>
           <h1 className="display-xl text-4xl text-ink sm:text-5xl">{title}</h1>
@@ -119,6 +129,8 @@ export function InstrumentResultShell({
           </section>
         )}
 
+        <ResultIllustrationSlot label={eyebrow} />
+
         {children}
 
         {closingNote && (
@@ -129,21 +141,24 @@ export function InstrumentResultShell({
           </section>
         )}
 
+        <AssessmentReferences slug={slug} />
+
         <ShareResultCta
           title={shareTitle}
           primaryLabel={primaryLabel}
           shareUrl={shareHref ?? retryHref}
         />
-      </div>
 
-      <InstrumentActionBar
-        saveLabel={saveLabel}
-        onSave={onSave}
-        saveDisabled={saveDisabled}
-        retryHref={retryHref}
-        suggestHref={suggestHref}
-        suggestName={suggestName}
-      />
+        <AssessmentResultActions
+          status={saveStatus}
+          onRetrySave={onRetrySave}
+          accountHref={accountHref}
+          retryHref={retryHref}
+          suggestHref={suggestHref}
+          suggestName={suggestName}
+          suggestReason={suggestReason}
+        />
+      </div>
     </>
   );
 }

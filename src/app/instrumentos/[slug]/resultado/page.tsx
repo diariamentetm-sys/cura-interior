@@ -1,18 +1,25 @@
 "use client";
 
-import { use, useEffect, useMemo, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { notFound, useRouter } from "next/navigation";
 import { InstrumentResultShell } from "@/components/instruments/InstrumentResultShell";
+import { ResponseReview } from "@/components/instruments/ResponseReview";
+import type { ResultSaveStatus } from "@/components/instruments/AssessmentResultActions";
 import { useAuth } from "@/components/AuthProvider";
 import {
   getInstrument,
   getSuggestedInstrument,
+  getSuggestionReason,
   type InstrumentSlug,
 } from "@/data/instruments";
 import { getLikertConfig } from "@/data/instruments/registry";
 import { loadInstrumentResult } from "@/lib/instrumentStorage";
 import { loadPortalState, recordInstrumentCompletion } from "@/lib/portalProgress";
-import { saveAuthenticatedCompletion } from "@/lib/portalSync";
+import {
+  isResultPersisted,
+  persistResultOnce,
+  resultSyncToken,
+} from "@/lib/resultPersistence";
 import type { LikertResultBase } from "@/types/likert";
 
 type PageProps = { params: Promise<{ slug: string }> };
@@ -20,11 +27,12 @@ type PageProps = { params: Promise<{ slug: string }> };
 export default function InstrumentResultPage({ params }: PageProps) {
   const { slug } = use(params);
   const router = useRouter();
-  const { user, refreshPortal } = useAuth();
+  const { user, loading, refreshPortal } = useAuth();
   const meta = getInstrument(slug as InstrumentSlug);
   const config = getLikertConfig(slug);
   const [result, setResult] = useState<LikertResultBase | null>(null);
-  const [saved, setSaved] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<ResultSaveStatus>("saving");
 
   const suggested = useMemo(() => {
     if (!meta) return null;
@@ -35,7 +43,44 @@ export default function InstrumentResultPage({ params }: PageProps) {
   useEffect(() => {
     if (!meta || meta.external) return;
     setResult(loadInstrumentResult<LikertResultBase>(meta.storageNamespace));
+    setReady(true);
   }, [meta]);
+
+  const persist = useCallback(async () => {
+    if (!meta || !result || loading) return;
+    if (!user) {
+      setSaveStatus("guest");
+      return;
+    }
+    const token = resultSyncToken(result);
+    if (isResultPersisted(user.id, meta.slug, token)) {
+      setSaveStatus("saved");
+      return;
+    }
+    setSaveStatus("saving");
+    try {
+      const state = recordInstrumentCompletion(meta.slug, {
+        primaryLabel: result.primaryLabel,
+        completedAt: result.calculatedAt,
+      });
+      await persistResultOnce({
+        userId: user.id,
+        slug: meta.slug,
+        token,
+        result: result as unknown as Record<string, unknown>,
+        state,
+      });
+      refreshPortal();
+      setSaveStatus("saved");
+    } catch {
+      setSaveStatus("error");
+    }
+  }, [loading, meta, refreshPortal, result, user]);
+
+  useEffect(() => {
+    if (!ready || !result || loading) return;
+    void persist();
+  }, [loading, persist, ready, result]);
 
   if (!meta || meta.external || !config || !suggested) {
     notFound();
@@ -43,6 +88,12 @@ export default function InstrumentResultPage({ params }: PageProps) {
   }
 
   const instrument = meta;
+
+  if (!ready) {
+    return (
+      <div className="py-24 text-center text-ink-muted">Abrindo resultado...</div>
+    );
+  }
 
   if (!result) {
     return (
@@ -61,26 +112,9 @@ export default function InstrumentResultPage({ params }: PageProps) {
 
   const scored = result;
 
-  async function handleSave() {
-    if (!user) {
-      router.push(`/login?next=${instrument.resultHref}`);
-      return;
-    }
-    const state = recordInstrumentCompletion(instrument.slug, {
-      primaryLabel: scored.primaryLabel,
-    });
-    await saveAuthenticatedCompletion({
-      userId: user.id,
-      slug: instrument.slug,
-      result: scored as unknown as Record<string, unknown>,
-      state,
-    });
-    refreshPortal();
-    setSaved(true);
-  }
-
   return (
     <InstrumentResultShell
+      slug={instrument.slug}
       eyebrow={instrument.name}
       title={scored.resultTitle || scored.primaryLabel || instrument.name}
       disclaimer="Resultado desta sessão. Não constitui diagnóstico psicológico nem substitui avaliação profissional."
@@ -92,15 +126,12 @@ export default function InstrumentResultPage({ params }: PageProps) {
       shareHref={instrument.href}
       suggestHref={suggested.href}
       suggestName={suggested.name}
-      onSave={() => void handleSave()}
-      saveLabel={
-        saved
-          ? "Salvo no Meu Mapa"
-          : user
-            ? "Salvar no Meu Mapa"
-            : "Entrar para salvar"
-      }
-      saveDisabled={saved}
-    />
+      suggestReason={getSuggestionReason(instrument.slug, suggested.slug)}
+      saveStatus={saveStatus}
+      accountHref={`/login?next=${encodeURIComponent(instrument.resultHref)}`}
+      onRetrySave={() => void persist()}
+    >
+      <ResponseReview items={config.items} answers={scored.answers} />
+    </InstrumentResultShell>
   );
 }

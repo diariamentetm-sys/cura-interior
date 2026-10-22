@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/Button";
+import { IntelectoCustomizer } from "@/components/perfil/IntelectoCustomizer";
 import { UserAvatar } from "@/components/UserAvatar";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -119,16 +120,13 @@ export default function PerfilPage() {
           </label>
         </fieldset>
 
-        <div className="space-y-2 border-t border-border/70 pt-6 text-sm text-ink-muted">
-          <p>
-            Experiências conhecidas: {portal.completions.length}
-          </p>
-          <p>Descobertas simbólicas: {portal.unlockedBadges.length}</p>
-          <p>
-            Desde{" "}
-            {new Date(portal.firstVisitAt).toLocaleDateString("pt-BR")}
-          </p>
-        </div>
+        <p className="border-t border-border/70 pt-6 text-sm text-ink-muted">
+          O histórico das avaliações e das insígnias fica no{" "}
+          <a href="/meu-mapa" className="font-semibold text-hero">
+            Meu Mapa
+          </a>
+          .
+        </p>
 
         {message && <p className="text-sm text-olive">{message}</p>}
 
@@ -148,6 +146,8 @@ export default function PerfilPage() {
           </Button>
         </div>
       </form>
+
+      <IntelectoCustomizer userId={user.id} />
     </div>
   );
 }

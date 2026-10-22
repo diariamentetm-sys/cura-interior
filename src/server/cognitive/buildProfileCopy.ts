@@ -124,13 +124,10 @@ export function buildRecommendations(scores: CategoryScore[]): string[] {
 
   for (const score of sorted.slice(0, 2)) {
     recs.push(
-      `Volte a itens de ${CATEGORY_LABELS[score.category].toLowerCase()} e revise as explicações das questões em que errou — o foco é estratégia, não memorização do gabarito.`,
+      `No gabarito comentado, revise os itens de ${CATEGORY_LABELS[score.category].toLowerCase()} em que a alternativa escolhida não era a correta. O foco é entender a resolução, não memorizar a resposta.`,
     );
   }
 
-  recs.push(
-    "Experimente o módulo de memória e atenção: ele não entra na pontuação principal, mas exercita foco e retenção sob demanda.",
-  );
   recs.push(
     "Repita a avaliação em outro dia para ver o que permanece estável e o que oscila com contexto — comparação entre sessões é mais informativa do que um único número. Nenhum destes passos produz um QI clínico.",
   );

@@ -7,6 +7,19 @@ export async function syncCognitiveResultToSupabase(
 ): Promise<void> {
   const supabase = createClient();
 
+  const existing = await supabase
+    .from("cura_cognitive_results")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("session_id", result.sessionId)
+    .maybeSingle();
+
+  if (existing.error && existing.error.code !== "PGRST116") {
+    throw new Error(existing.error.message);
+  }
+
+  if (existing.data) return;
+
   const { error } = await supabase.from("cura_cognitive_results").insert({
     user_id: userId,
     session_id: result.sessionId,
@@ -21,7 +34,6 @@ export async function syncCognitiveResultToSupabase(
   });
 
   if (error) {
-    // Table may not exist yet in every environment — keep local result usable.
-    console.warn("cognitive sync skipped/failed", error.message);
+    throw new Error(error.message);
   }
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MedalMark } from "@/components/mapa/MedalMark";
 import type { BadgeProgress } from "@/lib/meuMapa";
 
 type AchievementGalleryProps = {
@@ -39,29 +40,24 @@ export function AchievementGallery({ items }: AchievementGalleryProps) {
               }`}
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm ${
-                        item.unlocked
-                          ? "bg-hero text-cream"
-                          : "bg-sand text-ink-muted"
-                      }`}
-                      aria-hidden="true"
-                    >
-                      {item.badge.symbol}
-                    </span>
+                <div className="flex min-w-0 items-start gap-3">
+                  <MedalMark
+                    symbol={item.badge.symbol}
+                    unlocked={item.unlocked}
+                    label={item.badge.name}
+                  />
+                  <div className="min-w-0 space-y-1">
                     <h3 className="font-display text-lg text-ink sm:text-xl">
                       {item.badge.name}
                     </h3>
+                    <p className="text-sm text-ink-muted">
+                      {item.badge.requiresCount
+                        ? item.badge.requiresCount === 1
+                          ? "Conclua 1 avaliação"
+                          : `Conclua ${item.badge.requiresCount} avaliações diferentes`
+                        : item.badge.message}
+                    </p>
                   </div>
-                  <p className="text-sm text-ink-muted">
-                    {item.badge.requiresCount
-                      ? item.badge.requiresCount === 1
-                        ? "Conclua 1 avaliação"
-                        : `Conclua ${item.badge.requiresCount} avaliações diferentes`
-                      : item.badge.message}
-                  </p>
                 </div>
                 <p className="shrink-0 text-sm font-semibold tabular-nums text-ink-muted">
                   {item.unlocked

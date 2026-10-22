@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/Button";
-import { ProgressBar } from "@/components/ProgressBar";
-import { InstrumentActionBar } from "@/components/instruments/InstrumentActionBar";
+import { AssessmentNavBar } from "@/components/instruments/AssessmentNavBar";
 import type { LikertAnswer, LikertItem, LikertValue } from "@/types/likert";
 import {
   clearLikertProgress,
@@ -28,11 +26,6 @@ type LikertFlowProps<TResult> = {
   calculateResults: (answers: LikertAnswer[]) => TResult;
   onComplete?: (result: TResult) => void | Promise<void>;
   scale?: Array<{ value: LikertValue; label: string }>;
-  saveLabel: string;
-  onSave?: () => void;
-  retryHref: string;
-  suggestHref: string;
-  suggestName: string;
 };
 
 export function LikertFlow<TResult>({
@@ -42,17 +35,14 @@ export function LikertFlow<TResult>({
   calculateResults,
   onComplete,
   scale = SCALE,
-  saveLabel,
-  onSave,
-  retryHref,
-  suggestHref,
-  suggestName,
 }: LikertFlowProps<TResult>) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [hydrated, setHydrated] = useState(false);
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<LikertAnswer[]>([]);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const startedAt = useRef<number | null>(null);
 
   const total = items.length;
   const item = items[index];
@@ -70,6 +60,16 @@ export function LikertFlow<TResult>({
 
   useEffect(() => {
     if (!hydrated) return;
+    if (startedAt.current == null) startedAt.current = Date.now();
+    const timer = window.setInterval(() => {
+      if (startedAt.current == null) return;
+      setElapsedSeconds(Math.floor((Date.now() - startedAt.current) / 1000));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
     saveLikertProgress(namespace, {
       currentIndex: index,
       answers,
@@ -84,12 +84,6 @@ export function LikertFlow<TResult>({
       next.push({ questionId: item.id, value });
       return next;
     });
-  }
-
-  function handleRetry() {
-    clearLikertProgress(namespace);
-    setIndex(0);
-    setAnswers([]);
   }
 
   async function continueFlow() {
@@ -122,9 +116,7 @@ export function LikertFlow<TResult>({
 
   return (
     <>
-      <div className="mx-auto w-full max-w-2xl space-y-8 px-5 pb-44 pt-10 sm:px-8 sm:pb-40">
-        <ProgressBar current={index + 1} total={total} />
-
+      <div className="mx-auto w-full max-w-2xl space-y-8 px-5 pt-10 pb-36 sm:px-8">
         <article className="space-y-6">
           <h2 className="font-display text-2xl leading-snug text-ink sm:text-3xl">
             {item.text}
@@ -158,35 +150,18 @@ export function LikertFlow<TResult>({
             })}
           </fieldset>
         </article>
-
-        <div className="flex justify-between gap-3">
-          <Button
-            variant="ghost"
-            onClick={() => setIndex((i) => Math.max(0, i - 1))}
-            disabled={index === 0}
-          >
-            Voltar
-          </Button>
-          <Button
-            onClick={() => void continueFlow()}
-            disabled={selected == null || isPending}
-          >
-            {isLast
-              ? isPending
-                ? "Calculando..."
-                : "Ver resultado"
-              : "Continuar"}
-          </Button>
-        </div>
       </div>
 
-      <InstrumentActionBar
-        saveLabel={saveLabel}
-        onSave={onSave}
-        retryHref={retryHref}
-        onRetry={handleRetry}
-        suggestHref={suggestHref}
-        suggestName={suggestName}
+      <AssessmentNavBar
+        current={index + 1}
+        total={total}
+        elapsedSeconds={elapsedSeconds}
+        isLast={isLast}
+        pending={isPending}
+        backDisabled={index === 0}
+        nextDisabled={selected == null}
+        onBack={() => setIndex((current) => Math.max(0, current - 1))}
+        onNext={() => void continueFlow()}
       />
     </>
   );

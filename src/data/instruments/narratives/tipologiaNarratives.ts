@@ -59,7 +59,7 @@ export function buildTipologiaNarrative(
     };
   });
 
-  const summary = `Seu código tipológico exploratório nesta sessão foi ${typeCode}. Cada letra resume o lado em que você se inclinou com mais força em quatro eixos: energia social, atenção à informação, critério de decisão e estilo de organização da vida. Diferente de um diagnóstico, o código é um atalho descritivo — fala de preferências autorrelatadas agora, não de um destino fixo nem de uma “essência” oculta. Preferências podem ser nítidas em um eixo e quase empatadas em outro; empatates merecem leitura cuidadosa, porque o comportamento real mistura os dois polos conforme o contexto. Limite científico explícito: isto não é o MBTI® oficial nem o 16Personalities comercial, e os 16 tipos não são categorias psicológicas definitivas.`;
+  const summary = `Seu código tipológico exploratório nesta sessão foi ${typeCode}. Cada letra resume o lado em que você se inclinou com mais força em quatro eixos: energia social, atenção à informação, critério de decisão e estilo de organização da vida. Diferente de um diagnóstico, o código é um atalho descritivo — fala de preferências autorrelatadas agora, não de um destino fixo nem de uma “essência” oculta. Preferências podem ser nítidas em um eixo e quase empatadas em outro; eixos empatados merecem leitura cuidadosa, porque o comportamento real mistura os dois polos conforme o contexto. Limite científico explícito: isto não é o MBTI® oficial nem o 16Personalities comercial, e os 16 tipos não são categorias psicológicas definitivas.`;
 
   return {
     resultTitle: `Perfil tipológico exploratório ${typeCode}`,

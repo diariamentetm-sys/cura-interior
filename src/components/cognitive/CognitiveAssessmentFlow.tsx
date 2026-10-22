@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
-import { ProgressBar } from "@/components/ProgressBar";
+import { AssessmentNavBar } from "@/components/instruments/AssessmentNavBar";
 import { CognitiveQuestionView } from "@/components/cognitive/CognitiveQuestionView";
 import {
   getCognitiveClientKey,
@@ -27,6 +27,8 @@ export function CognitiveAssessmentFlow() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const questionStartedAt = useRef<number>(Date.now());
+  const sessionStartedAt = useRef<number>(Date.now());
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   const bootstrap = useCallback(async () => {
     setLoading(true);
@@ -91,6 +93,15 @@ export function CognitiveAssessmentFlow() {
   useEffect(() => {
     void bootstrap();
   }, [bootstrap]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setElapsedSeconds(
+        Math.floor((Date.now() - sessionStartedAt.current) / 1000),
+      );
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -234,42 +245,33 @@ export function CognitiveAssessmentFlow() {
   const total = payload.questions.length;
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-8 px-5 py-10 sm:px-8 sm:py-14">
-      <ProgressBar current={index + 1} total={total} />
+    <>
+      <div className="mx-auto w-full max-w-3xl space-y-8 px-5 py-10 pb-36 sm:px-8 sm:py-14">
+        {question && (
+          <CognitiveQuestionView
+            question={question}
+            selectedOptionId={selectedId}
+            onSelect={setSelectedId}
+          />
+        )}
 
-      {question && (
-        <CognitiveQuestionView
-          question={question}
-          index={index}
-          total={total}
-          selectedOptionId={selectedId}
-          onSelect={setSelectedId}
-        />
-      )}
-
-      {error && (
-        <p className="text-sm text-accent" role="alert">
-          {error}
-        </p>
-      )}
-
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() => void handleBack()}
-          disabled={index === 0 || submitting}
-        >
-          Voltar
-        </Button>
-        <Button
-          type="button"
-          onClick={() => void handleNext()}
-          disabled={!selectedId || submitting}
-        >
-          {index >= total - 1 ? "Ver resultados" : "Próxima"}
-        </Button>
+        {error && (
+          <p className="text-sm text-accent" role="alert">
+            {error}
+          </p>
+        )}
       </div>
-    </div>
+      <AssessmentNavBar
+        current={index + 1}
+        total={total}
+        elapsedSeconds={elapsedSeconds}
+        isLast={index >= total - 1}
+        pending={submitting}
+        backDisabled={index === 0}
+        nextDisabled={!selectedId}
+        onBack={() => void handleBack()}
+        onNext={() => void handleNext()}
+      />
+    </>
   );
 }

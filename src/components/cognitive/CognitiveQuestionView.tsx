@@ -7,16 +7,12 @@ import {
 
 type CognitiveQuestionViewProps = {
   question: PublicCognitiveQuestion;
-  index: number;
-  total: number;
   selectedOptionId: string | null;
   onSelect: (optionId: string) => void;
 };
 
 export function CognitiveQuestionView({
   question,
-  index,
-  total,
   selectedOptionId,
   onSelect,
 }: CognitiveQuestionViewProps) {
@@ -26,11 +22,6 @@ export function CognitiveQuestionView({
         <span className="rounded-full bg-sand px-3 py-1 font-medium text-ink">
           {CATEGORY_LABELS[question.category]}
         </span>
-        <span>
-          Questão {index + 1} de {total}
-        </span>
-        <span aria-hidden="true">·</span>
-        <span>~{question.suggestedSeconds}s sugeridos</span>
       </div>
 
       <h2

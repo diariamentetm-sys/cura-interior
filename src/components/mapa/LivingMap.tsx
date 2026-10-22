@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useId, useState } from "react";
 import {
@@ -9,7 +10,7 @@ import {
   type TerritoryProgress,
 } from "@/lib/meuMapa";
 import { getInstrumentStatus, type PortalState } from "@/lib/portalProgress";
-import { Button } from "@/components/Button";
+import { instrumentVisualThemes } from "@/components/instruments/instrumentVisuals";
 
 type LivingMapProps = {
   territories: TerritoryProgress[];
@@ -63,7 +64,7 @@ export function LivingMap({ territories, portal }: LivingMapProps) {
           aria-label="Caminho dos territórios"
         >
           <div
-            className="pointer-events-none absolute top-8 right-8 left-8 h-0 border-t-2 border-dotted border-border sm:top-9 sm:right-10 sm:left-10"
+            className="pointer-events-none absolute top-10 right-10 left-10 h-0 border-t-2 border-dotted border-border sm:top-12 sm:right-14 sm:left-14"
             aria-hidden="true"
           />
 
@@ -72,11 +73,15 @@ export function LivingMap({ territories, portal }: LivingMapProps) {
             const isSelected = territory.module.slug === selected?.module.slug;
             const shortName = getShortTerritoryName(territory.module.slug);
             const label = getPathStepLabel(status, territory);
+            const nodePanel =
+              territory.panel ||
+              nodeTone[territory.module.slug] ||
+              "bg-sand text-ink";
 
             return (
               <li
                 key={territory.module.slug}
-                className="relative z-[1] flex min-w-[5.5rem] flex-1 flex-col items-center sm:min-w-0"
+                className="relative z-[1] flex min-w-[6.5rem] flex-1 flex-col items-center sm:min-w-0"
               >
                 <button
                   type="button"
@@ -84,24 +89,41 @@ export function LivingMap({ territories, portal }: LivingMapProps) {
                   aria-pressed={isSelected}
                   aria-label={`${shortName}: ${territory.completedCount} de ${territory.totalCount}, ${label}`}
                   onClick={() => setSelectedSlug(territory.module.slug)}
-                  className={`flex w-full max-w-[9.5rem] flex-col items-center gap-2.5 rounded-2xl p-1 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hero ${
+                  className={`flex w-full max-w-[11rem] flex-col items-center gap-2.5 rounded-2xl p-1 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hero ${
                     isSelected ? "opacity-100" : "opacity-95 hover:opacity-100"
                   }`}
                 >
                   <span
-                    className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-bold shadow-sm transition duration-300 sm:h-[4.5rem] sm:w-[4.5rem] sm:text-2xl ${
-                      nodeTone[territory.module.slug] ?? "bg-sand text-ink"
-                    } ${
+                    className={`relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full shadow-sm transition duration-300 sm:h-24 sm:w-24 ${nodePanel} ${
                       status === "next"
                         ? "ring-4 ring-hero/35 motion-safe:animate-pulse"
                         : ""
                     } ${isSelected ? "scale-105" : ""}`}
                   >
-                    {status === "complete" ? (
-                      <span aria-hidden="true">✓</span>
+                    {territory.thumb ? (
+                      <Image
+                        src={territory.thumb}
+                        alt=""
+                        fill
+                        className="object-contain object-center p-1.5"
+                        sizes="96px"
+                      />
                     ) : (
-                      <span aria-hidden="true">{index + 1}</span>
+                      <span
+                        className="text-xl font-bold sm:text-2xl"
+                        aria-hidden="true"
+                      >
+                        {index + 1}
+                      </span>
                     )}
+                    {status === "complete" ? (
+                      <span
+                        className="absolute right-0.5 bottom-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-hero text-xs font-bold text-cream shadow-sm sm:h-7 sm:w-7 sm:text-sm"
+                        aria-hidden="true"
+                      >
+                        ✓
+                      </span>
+                    ) : null}
                   </span>
                   <span className="min-w-0 px-0.5">
                     <span className="block font-display text-sm leading-tight text-ink sm:text-base md:text-lg">
@@ -123,34 +145,25 @@ export function LivingMap({ territories, portal }: LivingMapProps) {
           className="rounded-[1.75rem] border border-border bg-bg-elevated p-5 sm:p-7"
           aria-live="polite"
         >
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-xl space-y-3">
-              <p className="section-eyebrow">Território selecionado</p>
-              <h3 className="font-display text-2xl text-ink sm:text-3xl">
-                {selected.module.name}
-              </h3>
-              <p className="text-sm leading-relaxed text-ink-muted sm:text-base">
-                {selected.module.shortDescription}
-              </p>
-              <p className="text-sm font-medium text-ink">
-                {selected.completedCount} de {selected.totalCount} avaliações
-                concluídas
-              </p>
-            </div>
-            {selected.nextInstrument ? (
-              <Button href={selected.nextInstrument.href}>
-                Próxima neste território
-              </Button>
-            ) : (
-              <Button href={selected.module.href} variant="secondary">
-                Ver território
-              </Button>
-            )}
+          <div className="max-w-2xl space-y-3">
+            <p className="section-eyebrow">Território selecionado</p>
+            <h3 className="font-display text-2xl text-ink sm:text-3xl">
+              {selected.module.name}
+            </h3>
+            <p className="text-sm leading-relaxed text-ink-muted sm:text-base">
+              {selected.module.shortDescription}
+            </p>
+            <p className="text-sm font-medium text-ink">
+              {selected.completedCount} de {selected.totalCount} avaliações
+              concluídas
+            </p>
           </div>
 
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-7 grid gap-4 sm:grid-cols-2">
             {selected.instruments.map((instrument) => {
               const status = getInstrumentStatus(instrument.slug, portal);
+              const theme = instrumentVisualThemes[instrument.slug];
+
               return (
                 <li key={instrument.slug}>
                   <Link
@@ -159,22 +172,33 @@ export function LivingMap({ territories, portal }: LivingMapProps) {
                         ? instrument.resultHref
                         : instrument.href
                     }
-                    className="flex min-h-14 items-center justify-between gap-3 rounded-2xl border border-border px-4 py-3 transition-colors hover:border-hero/40"
+                    className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-border bg-bg transition duration-300 hover:-translate-y-0.5 hover:border-hero/40"
                   >
-                    <span className="min-w-0">
-                      <span className="block font-display text-base text-ink">
-                        {instrument.name}
-                      </span>
-                      <span className="block text-xs text-ink-muted">
-                        {instrument.estimatedTime}
-                      </span>
+                    <span
+                      className={`relative flex h-36 w-full items-end justify-center overflow-hidden sm:h-40 ${theme.panel}`}
+                    >
+                      {theme.thumb ? (
+                        <Image
+                          src={theme.thumb}
+                          alt=""
+                          fill
+                          className="object-contain object-center p-2 transition duration-300 group-hover:scale-[1.04]"
+                          sizes="(max-width: 640px) 100vw, 40vw"
+                        />
+                      ) : null}
                     </span>
-                    <span className="shrink-0 text-xs font-semibold tracking-wide text-hero">
-                      {status === "known"
-                        ? "Revisar"
-                        : status === "discovering"
-                          ? "Continuar"
-                          : "Explorar"}
+                    <span className="flex flex-1 flex-col gap-3 p-5 sm:p-6">
+                      <span className="space-y-1.5">
+                        <span className="block font-display text-xl leading-tight text-ink sm:text-2xl">
+                          {instrument.name}
+                        </span>
+                        <span className="block text-sm text-ink-muted">
+                          {instrument.estimatedTime}
+                        </span>
+                      </span>
+                      <span className="mt-auto inline-flex w-fit items-center rounded-full bg-hero px-4 py-2 text-sm font-semibold text-cream transition group-hover:brightness-110">
+                        {status === "known" ? "Revisar" : "Faça o teste"}
+                      </span>
                     </span>
                   </Link>
                 </li>

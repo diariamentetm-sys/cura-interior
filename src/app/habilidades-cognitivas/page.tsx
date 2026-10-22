@@ -96,9 +96,6 @@ export default function CognitiveIntroPage() {
 
       <div className="flex flex-col gap-3 pt-2 sm:flex-row">
         <Button href="/habilidades-cognitivas/avaliacao">Começar avaliação</Button>
-        <Button href="/habilidades-cognitivas/memoria" variant="secondary">
-          Memória e atenção
-        </Button>
         <Button href="/modulos/inteligencia-cognicao" variant="ghost">
           Voltar ao módulo
         </Button>
