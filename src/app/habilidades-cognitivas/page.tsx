@@ -1,11 +1,12 @@
 import { Button } from "@/components/Button";
+import { AssessmentBreadcrumb } from "@/components/instruments/AssessmentBreadcrumb";
 import { CATEGORY_LABELS, COGNITIVE_CATEGORIES } from "@/types/cognitive";
 
 export default function CognitiveIntroPage() {
   return (
     <article className="mx-auto w-full max-w-3xl space-y-10 px-5 py-14 sm:px-8 sm:py-20">
       <header className="space-y-5">
-        <p className="section-eyebrow">Questionário</p>
+        <AssessmentBreadcrumb slug="perfil-cognitivo" />
         <h1 className="display-xl text-4xl text-ink sm:text-5xl">
           Perfil Cognitivo
         </h1>

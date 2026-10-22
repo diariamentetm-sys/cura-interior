@@ -1,4 +1,5 @@
 import { Button } from "@/components/Button";
+import { AssessmentBreadcrumb } from "@/components/instruments/AssessmentBreadcrumb";
 import { InstrumentVisualPanel } from "@/components/instruments/instrumentVisuals";
 import type { InstrumentEditorial } from "@/data/instruments/editorialIntros";
 import type { InstrumentMeta } from "@/data/instruments";
@@ -19,7 +20,7 @@ export function InstrumentIntro({
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 pb-36 pt-14 sm:px-8 sm:pb-32 lg:grid-cols-12 lg:gap-12 lg:pt-16">
         <article className="space-y-10 lg:col-span-7">
           <header className="space-y-5">
-            <p className="section-eyebrow">Questionário</p>
+            <AssessmentBreadcrumb slug={instrument.slug} />
             <h1 className="display-xl text-4xl text-ink sm:text-5xl">
               {instrument.name}
             </h1>
