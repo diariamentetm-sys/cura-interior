@@ -2,17 +2,14 @@
 
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/Button";
-import { IntelectoCustomizer } from "@/components/perfil/IntelectoCustomizer";
-import { UserAvatar } from "@/components/UserAvatar";
+import { IntelectoAvatar } from "@/components/perfil/IntelectoAvatar";
+import { IntelectoAvatarDrawer } from "@/components/perfil/IntelectoAvatarDrawer";
 import { createClient } from "@/lib/supabase/client";
-import {
-  getDiscoveryLevel,
-} from "@/lib/portalProgress";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function PerfilPage() {
-  const { user, profile, portal, loading, refreshProfile, signOut } = useAuth();
+  const { user, profile, loading, refreshProfile, signOut } = useAuth();
   const router = useRouter();
   const [displayName, setDisplayName] = useState("");
   const [avatarType, setAvatarType] = useState<"abstract" | "initials">(
@@ -20,6 +17,7 @@ export default function PerfilPage() {
   );
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [avatarEditorOpen, setAvatarEditorOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login?next=/perfil");
@@ -65,8 +63,6 @@ export default function PerfilPage() {
     );
   }
 
-  const level = getDiscoveryLevel(portal.completions);
-
   return (
     <div className="mx-auto w-full max-w-2xl px-5 py-14 sm:px-8 sm:py-20">
       <div className="space-y-4">
@@ -79,14 +75,22 @@ export default function PerfilPage() {
         </p>
       </div>
 
-      <div className="mt-10 flex justify-center">
-        <UserAvatar
-          name={displayName || profile?.display_name}
-          level={level}
-          avatarType={avatarType}
-          size="md"
-        />
+      <div className="mt-10 flex flex-col items-center gap-3">
+        <IntelectoAvatar userId={user.id} />
+        <button
+          type="button"
+          onClick={() => setAvatarEditorOpen(true)}
+          className="text-sm font-medium text-ink-muted underline-offset-4 transition-colors hover:text-ink hover:underline"
+        >
+          Editar avatar
+        </button>
       </div>
+
+      <IntelectoAvatarDrawer
+        userId={user.id}
+        open={avatarEditorOpen}
+        onClose={() => setAvatarEditorOpen(false)}
+      />
 
       <form onSubmit={handleSave} className="mt-10 space-y-6">
         <label className="block space-y-2">
@@ -97,28 +101,6 @@ export default function PerfilPage() {
             className="w-full rounded-sm border border-border bg-bg-elevated px-4 py-3 text-ink outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-wine"
           />
         </label>
-
-        <fieldset className="space-y-3">
-          <legend className="text-sm text-ink">Avatar</legend>
-          <label className="flex items-center gap-3 text-sm text-ink-muted">
-            <input
-              type="radio"
-              name="avatar"
-              checked={avatarType === "abstract"}
-              onChange={() => setAvatarType("abstract")}
-            />
-            Abstrato
-          </label>
-          <label className="flex items-center gap-3 text-sm text-ink-muted">
-            <input
-              type="radio"
-              name="avatar"
-              checked={avatarType === "initials"}
-              onChange={() => setAvatarType("initials")}
-            />
-            Iniciais
-          </label>
-        </fieldset>
 
         <p className="border-t border-border/70 pt-6 text-sm text-ink-muted">
           O histórico das avaliações e das insígnias fica no{" "}
@@ -146,8 +128,6 @@ export default function PerfilPage() {
           </Button>
         </div>
       </form>
-
-      <IntelectoCustomizer userId={user.id} />
     </div>
   );
 }

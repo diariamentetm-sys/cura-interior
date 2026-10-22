@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/Button";
-import { UserAvatar } from "@/components/UserAvatar";
+import { IntelectoAvatar } from "@/components/perfil/IntelectoAvatar";
 
 export function Header() {
   const pathname = usePathname();
-  const { user, profile, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   const isActiveQuiz =
     pathname?.includes("/questionario") &&
@@ -89,14 +89,7 @@ export function Header() {
                 className="hidden rounded-full sm:inline-flex"
                 aria-label="Perfil"
               >
-                <UserAvatar
-                  name={profile?.display_name}
-                  avatarType={
-                    profile?.avatar_type === "initials" ? "initials" : "abstract"
-                  }
-                  level={profile?.discovery_level ?? 0}
-                  size="sm"
-                />
+                <IntelectoAvatar userId={user.id} size="sm" />
               </Link>
             )}
           </div>
