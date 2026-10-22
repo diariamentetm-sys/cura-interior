@@ -2,9 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { AssessmentBreadcrumb } from "@/components/instruments/AssessmentBreadcrumb";
 import { AssessmentNavBar } from "@/components/instruments/AssessmentNavBar";
-import type { InstrumentSlug } from "@/data/instruments";
 import type { LikertAnswer, LikertItem, LikertValue } from "@/types/likert";
 import {
   clearLikertProgress,
@@ -22,7 +20,6 @@ const SCALE: Array<{ value: LikertValue; label: string }> = [
 ];
 
 type LikertFlowProps<TResult> = {
-  instrumentSlug: InstrumentSlug;
   namespace: string;
   items: LikertItem[];
   resultPath: string;
@@ -32,7 +29,6 @@ type LikertFlowProps<TResult> = {
 };
 
 export function LikertFlow<TResult>({
-  instrumentSlug,
   namespace,
   items,
   resultPath,
@@ -109,7 +105,6 @@ export function LikertFlow<TResult>({
   return (
     <>
       <div className="mx-auto w-full max-w-2xl space-y-8 px-5 pt-10 pb-36 sm:px-8">
-        <AssessmentBreadcrumb slug={instrumentSlug} />
         <article className="space-y-6">
           <h2 className="font-display text-2xl leading-snug text-ink sm:text-3xl">
             {item.text}

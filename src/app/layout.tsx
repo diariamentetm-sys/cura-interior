@@ -4,6 +4,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { MobileNav } from "@/components/MobileNav";
+import { PortalBreadcrumb } from "@/components/PortalBreadcrumb";
 import "./globals.css";
 
 const display = Montserrat({
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <AuthProvider>
           <Header />
+          <PortalBreadcrumb />
           <main className="flex-1">{children}</main>
           <Footer />
           <MobileNav />

@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { ShareResultCta } from "@/components/ShareResultCta";
-import { AssessmentBreadcrumb } from "@/components/instruments/AssessmentBreadcrumb";
 import { AssessmentReferences } from "@/components/instruments/AssessmentReferences";
 import {
   AssessmentResultActions,
@@ -60,7 +59,6 @@ export function InstrumentResultShell({
     <>
       <div className="mx-auto w-full max-w-3xl space-y-10 px-5 py-12 sm:px-8 sm:py-16">
         <header className="space-y-4">
-          <AssessmentBreadcrumb slug={slug} />
           <h1 className="display-xl text-4xl text-ink sm:text-5xl">{title}</h1>
           <p className="text-sm text-ink-muted">{disclaimer}</p>
         </header>

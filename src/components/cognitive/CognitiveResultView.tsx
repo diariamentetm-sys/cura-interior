@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/Button";
 import { CognitiveDimensionChart } from "@/components/cognitive/CognitiveDimensionChart";
 import { ShareResultCta } from "@/components/ShareResultCta";
-import { AssessmentBreadcrumb } from "@/components/instruments/AssessmentBreadcrumb";
 import { AssessmentReferences } from "@/components/instruments/AssessmentReferences";
 import { AssessmentResultActions, type ResultSaveStatus } from "@/components/instruments/AssessmentResultActions";
 import { ResultIllustrationSlot } from "@/components/instruments/ResultIllustrationSlot";
@@ -164,7 +163,6 @@ export function CognitiveResultView() {
   return (
     <div className="mx-auto w-full max-w-3xl space-y-12 px-5 py-12 sm:px-8 sm:py-16">
       <header className="space-y-4">
-        <AssessmentBreadcrumb slug="perfil-cognitivo" />
         <h1 className="display-xl text-4xl text-ink sm:text-5xl">
           Um mapa do raciocínio nesta sessão
         </h1>

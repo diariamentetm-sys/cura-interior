@@ -33,7 +33,6 @@ export default function InstrumentQuestionnairePage({ params }: PageProps) {
 
   return (
     <LikertFlow
-      instrumentSlug={instrument.slug}
       namespace={instrument.storageNamespace}
       items={config.items}
       resultPath={instrument.resultHref}

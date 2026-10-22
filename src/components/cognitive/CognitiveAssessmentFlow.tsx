@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
-import { AssessmentBreadcrumb } from "@/components/instruments/AssessmentBreadcrumb";
 import { AssessmentNavBar } from "@/components/instruments/AssessmentNavBar";
 import { CognitiveQuestionView } from "@/components/cognitive/CognitiveQuestionView";
 import {
@@ -237,7 +236,6 @@ export function CognitiveAssessmentFlow() {
   return (
     <>
       <div className="mx-auto w-full max-w-3xl space-y-8 px-5 py-10 pb-36 sm:px-8 sm:py-14">
-        <AssessmentBreadcrumb slug="perfil-cognitivo" />
         {question && (
           <CognitiveQuestionView
             question={question}
