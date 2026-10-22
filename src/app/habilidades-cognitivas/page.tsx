@@ -1,14 +1,23 @@
 import { Button } from "@/components/Button";
+import { InstrumentVisualPanel } from "@/components/instruments/instrumentVisuals";
+import { getInstrument } from "@/data/instruments";
 import { CATEGORY_LABELS, COGNITIVE_CATEGORIES } from "@/types/cognitive";
 
 export default function CognitiveIntroPage() {
+  const instrument = getInstrument("perfil-cognitivo");
+
   return (
-    <article className="mx-auto w-full max-w-3xl space-y-10 px-5 py-14 sm:px-8 sm:py-20">
+    <div className="mx-auto grid w-full max-w-6xl gap-8 px-5 pb-16 pt-14 sm:grid-cols-12 sm:gap-8 sm:px-8 sm:pt-16 lg:gap-12">
+      <article className="min-w-0 space-y-10 sm:col-span-7">
       <header className="space-y-5">
         <h1 className="display-xl text-4xl text-ink sm:text-5xl">
           Perfil Cognitivo
         </h1>
       </header>
+
+      <div className="sm:hidden">
+        <InstrumentVisualPanel slug="perfil-cognitivo" />
+      </div>
 
       <section className="space-y-4">
         <p className="text-base leading-relaxed text-ink-muted sm:text-lg">
@@ -99,6 +108,18 @@ export default function CognitiveIntroPage() {
           Voltar ao módulo
         </Button>
       </div>
-    </article>
+      </article>
+
+      <aside className="hidden sm:col-span-5 sm:block">
+        <div className="sticky top-28">
+          <InstrumentVisualPanel slug="perfil-cognitivo" />
+          {instrument ? (
+            <p className="mt-4 text-sm text-ink-muted">
+              {instrument.shortDescription}
+            </p>
+          ) : null}
+        </div>
+      </aside>
+    </div>
   );
 }

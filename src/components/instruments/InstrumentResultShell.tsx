@@ -57,11 +57,16 @@ export function InstrumentResultShell({
 
   return (
     <>
-      <div className="mx-auto w-full max-w-3xl space-y-10 px-5 py-12 sm:px-8 sm:py-16">
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-12 lg:items-start lg:gap-12">
+        <div className="min-w-0 space-y-10 lg:col-span-7">
         <header className="space-y-4">
           <h1 className="display-xl text-4xl text-ink sm:text-5xl">{title}</h1>
           <p className="text-sm text-ink-muted">{disclaimer}</p>
         </header>
+
+        <div className="lg:hidden">
+          <ResultIllustrationSlot label={eyebrow} />
+        </div>
 
         <section className="space-y-4 border-t border-border pt-8">
           <p className="text-xs font-semibold uppercase tracking-wide text-accent-blue">
@@ -128,8 +133,6 @@ export function InstrumentResultShell({
           </section>
         )}
 
-        <ResultIllustrationSlot label={eyebrow} />
-
         {children}
 
         {closingNote && (
@@ -157,6 +160,13 @@ export function InstrumentResultShell({
           suggestName={suggestName}
           suggestReason={suggestReason}
         />
+        </div>
+
+        <aside className="hidden lg:col-span-5 lg:block">
+          <div className="sticky top-28">
+            <ResultIllustrationSlot label={eyebrow} />
+          </div>
+        </aside>
       </div>
     </>
   );

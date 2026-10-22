@@ -16,15 +16,15 @@ export function InstrumentIntro({
 }: InstrumentIntroProps) {
   return (
     <>
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 pb-36 pt-14 sm:px-8 sm:pb-32 lg:grid-cols-12 lg:gap-12 lg:pt-16">
-        <article className="space-y-10 lg:col-span-7">
+      <div className="mx-auto grid w-full max-w-6xl gap-8 px-5 pb-36 pt-14 sm:grid-cols-12 sm:gap-8 sm:px-8 sm:pb-32 sm:pt-16 lg:gap-12">
+        <article className="min-w-0 space-y-10 sm:col-span-7">
           <header className="space-y-5">
             <h1 className="display-xl text-4xl text-ink sm:text-5xl">
               {instrument.name}
             </h1>
           </header>
 
-          <div className="lg:hidden">
+          <div className="sm:hidden">
             <InstrumentVisualPanel slug={instrument.slug} />
           </div>
 
@@ -86,7 +86,7 @@ export function InstrumentIntro({
           </section>
         </article>
 
-        <aside className="hidden lg:col-span-5 lg:block">
+        <aside className="hidden sm:col-span-5 sm:block">
           <div className="sticky top-28">
             <InstrumentVisualPanel slug={instrument.slug} />
             <p className="mt-4 text-sm text-ink-muted">

@@ -161,7 +161,8 @@ export function CognitiveResultView() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-12 px-5 py-12 sm:px-8 sm:py-16">
+    <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-12 lg:items-start lg:gap-12">
+      <div className="min-w-0 space-y-12 lg:col-span-7">
       <header className="space-y-4">
         <h1 className="display-xl text-4xl text-ink sm:text-5xl">
           Um mapa do raciocínio nesta sessão
@@ -176,7 +177,9 @@ export function CognitiveResultView() {
         </p>
       </header>
 
-      <ResultIllustrationSlot label="o perfil cognitivo" />
+      <div className="lg:hidden">
+        <ResultIllustrationSlot label="o perfil cognitivo" />
+      </div>
 
       <section className="space-y-6 border-t border-border pt-8">
         <h2 className="font-display text-2xl text-ink sm:text-3xl">
@@ -342,6 +345,13 @@ export function CognitiveResultView() {
         suggestName={suggested.name}
         suggestReason={getSuggestionReason("perfil-cognitivo", suggested.slug)}
       />
+      </div>
+
+      <aside className="hidden lg:col-span-5 lg:block">
+        <div className="sticky top-28">
+          <ResultIllustrationSlot label="o perfil cognitivo" />
+        </div>
+      </aside>
     </div>
   );
 }
