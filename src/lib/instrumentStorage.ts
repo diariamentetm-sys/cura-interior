@@ -42,6 +42,11 @@ export function clearLikertProgress(namespace: string): void {
   window.localStorage.removeItem(progressKey(namespace));
 }
 
+export function clearInstrumentResult(namespace: string): void {
+  if (!canUseStorage()) return;
+  window.localStorage.removeItem(resultKey(namespace));
+}
+
 export function saveInstrumentResult<T extends LikertResultBase | Record<string, unknown>>(
   namespace: string,
   result: T,

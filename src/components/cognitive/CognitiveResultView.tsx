@@ -118,7 +118,7 @@ export function CognitiveResultView() {
           state,
         });
       }
-      refreshPortal();
+      await refreshPortal();
       setSaveStatus("saved");
       try {
         await syncCognitiveResultToSupabase(user.id, result);

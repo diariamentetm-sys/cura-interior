@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Montserrat } from "next/font/google";
+import { AccountSyncNotice } from "@/components/AccountSyncNotice";
 import { AuthProvider } from "@/components/AuthProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <AuthProvider>
           <Header />
+          <AccountSyncNotice />
           <PortalBreadcrumb />
           <main className="flex-1">{children}</main>
           <Footer />

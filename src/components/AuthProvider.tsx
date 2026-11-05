@@ -11,9 +11,10 @@ import {
 } from "react";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { syncLocalProgressToSupabase } from "@/lib/portalSync";
+import { reloadAccountPortal } from "@/lib/portalSync";
 import {
   STABLE_EMPTY_PORTAL,
+  localResultsBelongTo,
   syncPortalState,
   type PortalState,
 } from "@/lib/portalProgress";
@@ -28,24 +29,53 @@ type AuthContextValue = {
   user: User | null;
   profile: Profile | null;
   portal: PortalState;
+  syncError: string | null;
   loading: boolean;
-  refreshPortal: () => void;
+  refreshPortal: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function readableSyncError(error: unknown): string {
+  const message = error instanceof Error ? error.message : "";
+  const detail =
+    !message || /fetch|network|timeout|failed to fetch/i.test(message)
+      ? "A conta não conseguiu falar com o banco."
+      : message;
+  return `${detail} O Meu Mapa está mostrando os testes deste dispositivo, não a confirmação da conta.`;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [portal, setPortal] = useState<PortalState>(STABLE_EMPTY_PORTAL);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [supabase] = useState(() => createClient());
 
-  const refreshPortal = useCallback(() => {
-    setPortal(syncPortalState());
-  }, []);
+  const refreshPortal = useCallback(async () => {
+    const {
+      data: { user: current },
+    } = await supabase.auth.getUser();
+
+    if (!current) {
+      setPortal(syncPortalState());
+      return;
+    }
+
+    try {
+      const state = await reloadAccountPortal(current.id);
+      setPortal(state);
+      setSyncError(null);
+    } catch (error) {
+      setSyncError(readableSyncError(error));
+      setPortal(
+        localResultsBelongTo(current.id) ? syncPortalState() : STABLE_EMPTY_PORTAL,
+      );
+    }
+  }, [supabase]);
 
   const refreshProfile = useCallback(async () => {
     const {
@@ -82,8 +112,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true;
 
     async function init() {
-      setPortal(syncPortalState());
-
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -92,16 +120,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setUser(session?.user ?? null);
 
-      if (session?.user) {
-        try {
-          await syncLocalProgressToSupabase(session.user.id);
-        } catch {
-          // Network/auth errors shouldn't block the app.
-        }
-        if (!mounted) return;
-        await refreshProfile();
+      if (!session?.user) {
+        setPortal(syncPortalState());
+        setLoading(false);
+        return;
       }
 
+      if (!localResultsBelongTo(session.user.id)) {
+        setPortal(STABLE_EMPTY_PORTAL);
+      }
+
+      await refreshPortal();
+      if (!mounted) return;
+      await refreshProfile();
       if (mounted) setLoading(false);
     }
 
@@ -113,13 +144,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
 
       if (session?.user && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
-        try {
-          await syncLocalProgressToSupabase(session.user.id);
-        } catch {
-          // ignore
+        if (!localResultsBelongTo(session.user.id)) {
+          setPortal(STABLE_EMPTY_PORTAL);
         }
+        await refreshPortal();
         await refreshProfile();
-        setPortal(syncPortalState());
       }
 
       if (event === "SIGNED_OUT") {
@@ -131,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [refreshProfile, supabase]);
+  }, [refreshPortal, refreshProfile, supabase]);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
@@ -144,12 +173,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       profile,
       portal,
+      syncError,
       loading,
       refreshPortal,
       refreshProfile,
       signOut,
     }),
-    [user, profile, portal, loading, refreshPortal, refreshProfile, signOut],
+    [user, profile, portal, syncError, loading, refreshPortal, refreshProfile, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

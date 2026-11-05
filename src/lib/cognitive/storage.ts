@@ -48,6 +48,13 @@ export function clearLocalCognitiveSession(): void {
   window.localStorage.removeItem(SESSION_KEY);
 }
 
+export function clearCognitiveDeviceCache(): void {
+  if (!canUseStorage()) return;
+  window.localStorage.removeItem(SESSION_KEY);
+  window.localStorage.removeItem(RESULT_KEY);
+  window.localStorage.removeItem(EXPLORATION_KEY);
+}
+
 export function saveLocalCognitiveResult(result: CognitiveResult): void {
   if (!canUseStorage()) return;
   window.localStorage.setItem(RESULT_KEY, JSON.stringify(result));

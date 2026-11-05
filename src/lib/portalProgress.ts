@@ -11,6 +11,7 @@ import { hasInstrumentProgress, hasInstrumentResult, loadInstrumentResult } from
 import { loadCognitiveExploration } from "@/lib/cognitive/storage";
 
 const PORTAL_KEY = "cura-interior:portal";
+const OWNER_KEY = "cura-interior:portal-owner";
 
 export type LocalCompletion = {
   slug: InstrumentSlug | string;
@@ -92,6 +93,77 @@ function savePortalState(state: PortalState): void {
   } catch {
     // ignore
   }
+}
+
+function readStoredPortal(): PortalState | null {
+  if (!canUseStorage()) return null;
+  try {
+    const raw = window.localStorage.getItem(PORTAL_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PortalState;
+    return {
+      ...emptyState(),
+      ...parsed,
+      completions: Array.isArray(parsed.completions) ? parsed.completions : [],
+      unlockedBadges: Array.isArray(parsed.unlockedBadges) ? parsed.unlockedBadges : [],
+      visitDays: Array.isArray(parsed.visitDays) ? parsed.visitDays : [],
+      inProgress: Array.isArray(parsed.inProgress) ? parsed.inProgress : [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function getPortalOwner(): string | null {
+  if (!canUseStorage()) return null;
+  return window.localStorage.getItem(OWNER_KEY);
+}
+
+export function rememberPortalOwner(userId: string): void {
+  if (!canUseStorage()) return;
+  window.localStorage.setItem(OWNER_KEY, userId);
+}
+
+export function localResultsBelongTo(userId: string): boolean {
+  const owner = getPortalOwner();
+  return owner === null || owner === userId;
+}
+
+export function applyRemoteCompletions(
+  completions: LocalCompletion[],
+  options?: { fresh?: boolean },
+): PortalState {
+  const stored = options?.fresh ? null : readStoredPortal();
+  const base = stored ?? emptyState();
+  const now = new Date().toISOString();
+  const day = todayKey();
+  const visitDays = options?.fresh
+    ? [day]
+    : base.visitDays.includes(day)
+      ? base.visitDays
+      : [...base.visitDays, day];
+  const inProgress = instruments
+    .filter((instrument) => {
+      if (completions.some((item) => item.slug === instrument.slug)) return false;
+      if (instrument.external) {
+        return loadCognitiveExploration().status === "discovering";
+      }
+      return hasInstrumentProgress(instrument.storageNamespace);
+    })
+    .map((instrument) => instrument.slug);
+
+  const next: PortalState = {
+    ...base,
+    completions,
+    inProgress,
+    firstVisitAt: options?.fresh ? now : base.firstVisitAt || now,
+    lastVisitAt: now,
+    visitDays,
+    unlockedBadges: computeUnlockedBadges(completions, visitDays),
+  };
+
+  savePortalState(next);
+  return next;
 }
 
 export function syncPortalState(base?: PortalState): PortalState {

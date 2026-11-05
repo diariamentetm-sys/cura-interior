@@ -54,6 +54,7 @@ export default function InstrumentResultPage({ params }: PageProps) {
     }
     const token = resultSyncToken(result);
     if (isResultPersisted(user.id, meta.slug, token)) {
+      await refreshPortal();
       setSaveStatus("saved");
       return;
     }
@@ -70,7 +71,7 @@ export default function InstrumentResultPage({ params }: PageProps) {
         result: result as unknown as Record<string, unknown>,
         state,
       });
-      refreshPortal();
+      await refreshPortal();
       setSaveStatus("saved");
     } catch {
       setSaveStatus("error");

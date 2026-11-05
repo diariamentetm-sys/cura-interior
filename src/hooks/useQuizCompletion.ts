@@ -21,15 +21,18 @@ export function useQuizCompletion<TResult>({
     () => async (result: TResult) => {
       const primaryLabel = getPrimaryLabel(result);
       const state = recordInstrumentCompletion(slug, { primaryLabel });
-      refreshPortal();
 
-      if (user) {
-        await saveAuthenticatedCompletion({
-          userId: user.id,
-          slug,
-          result: result as Record<string, unknown>,
-          state,
-        });
+      try {
+        if (user) {
+          await saveAuthenticatedCompletion({
+            userId: user.id,
+            slug,
+            result: result as Record<string, unknown>,
+            state,
+          });
+        }
+      } finally {
+        await refreshPortal();
       }
     },
     [getPrimaryLabel, refreshPortal, slug, user],
