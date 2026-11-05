@@ -14,7 +14,7 @@ export function MagazineModuleSection({ module }: MagazineModuleSectionProps) {
 
   return (
     <section className="border-t border-border">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-14 sm:gap-10 sm:px-8 sm:py-16 lg:py-20">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 py-10 sm:gap-8 sm:px-8 sm:py-12 lg:py-14">
         <header className="max-w-2xl space-y-4">
           <p className="section-eyebrow">
             Módulo {String(module.order).padStart(2, "0")}
@@ -33,8 +33,8 @@ export function MagazineModuleSection({ module }: MagazineModuleSectionProps) {
           )}
         </header>
 
-        <div className="flex flex-col gap-5">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="flex min-w-0 flex-col gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
             {list.map((instrument) => (
               <InstrumentMagazineCard
                 key={instrument.slug}
